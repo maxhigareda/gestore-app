@@ -1,0 +1,65 @@
+:root {
+  /* Monday.com Dark Mode Inspired Colors */
+  --color-main-background: #181B34; /* Deep Navy */
+  --color-secondary-background: #292f4c; /* Lighter Navy for Sidebars */
+  --color-surface: #202440; /* Card/Surface */
+  --color-hover: #323a5e;
+  
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #dcdde2;
+  --color-text-muted: #9699a6;
+
+  --color-primary: #0073ea; /* Monday Blue */
+  --color-primary-hover: #0060b9;
+  
+  --color-success: #00ca72;
+  --color-warning: #ffcb00;
+  --color-danger: #e2445c;
+  
+  --border-color: #373e5e;
+  --border-radius: 8px;
+  
+  --sidebar-width-primary: 60px;
+  --sidebar-width-secondary: 240px;
+  --topbar-height: 60px;
+  
+  --font-family: 'Figtree', 'Roboto', system-ui, sans-serif; /* Modern, clean font suggestion */
+  
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--color-main-background);
+  color: var(--color-text-primary);
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+
+/* Utilities */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.full-height {
+  height: 100vh;
+}
