@@ -141,7 +141,7 @@ const EvaluationRunner: React.FC<EvaluationRunnerProps> = ({ evaluationId, evalu
                 }}>
                     {isPassing ?
                         <CheckCircle size={64} color="#10b981" style={{ marginBottom: '1rem' }} /> :
-                        <AlertCircle size={64} color="#f59e0b" style={{ marginBottom: '1rem' }} />
+                        <X size={64} color="#f59e0b" style={{ marginBottom: '1rem' }} />
                     }
 
                     <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{percentage}%</h2>
