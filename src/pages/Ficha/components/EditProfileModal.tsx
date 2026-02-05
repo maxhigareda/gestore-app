@@ -5,11 +5,12 @@ import { supabase } from '../../../lib/supabaseClient';
 
 interface EditProfileModalProps {
     user: UserProfile;
+    userId: string;
     onClose: () => void;
     onSave: () => void;
 }
 
-const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onSave }) => {
+const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClose, onSave }) => {
     const [formData, setFormData] = useState<UserProfile>(user);
     const [saving, setSaving] = useState(false);
     const [activeTab, setActiveTab] = useState<'personal' | 'job'>('personal');
@@ -33,7 +34,10 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onSa
                 rfc: formData.rfc,
                 birth_date: sanitizeDate(formData.birthDate),
                 address: formData.address,
-                company_entry_date: sanitizeDate(formData.dateOfEntry),
+
+                // Correctly map both date fields
+                date_of_entry: sanitizeDate(formData.dateOfEntry),       // Fecha Ingreso Grupo
+                company_entry_date: sanitizeDate(formData.companyEntryDate), // Fecha Ingreso Compañía
 
                 department: formData.area, // Mapping 'area' to department
                 division: formData.division,
@@ -50,17 +54,22 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onSa
                 updated_at: new Date().toISOString()
             };
 
+            // Use the userId passed to the component, NOT email, to ensure we target the correct row
+            // (Note: `user` prop in this component is technically the Profile data, which might check email,
+            // but we added userId prop to be safe)
+
+            // For now, assuming we will add it. If not present in props yet, we must change interface below.
+
             const { error } = await supabase
                 .from('profiles')
                 .update(updates)
-                .eq('email', formData.email); // Assuming we can match by email or ID.
+                .eq('id', userId);
 
             if (error) throw error;
             onSave();
             onClose();
         } catch (error: any) {
             console.error('Error updating profile:', error);
-            // Show detailed error message
             alert(`Error al guardar: ${error.message || 'Verifica los datos e intenta de nuevo.'}`);
         } finally {
             setSaving(false);

@@ -97,6 +97,7 @@ const FichaPage: React.FC = () => {
             {isEditModalOpen && (
                 <EditProfileModal
                     user={profile}
+                    userId={user?.id || ''}
                     onClose={() => setIsEditModalOpen(false)}
                     onSave={fetchProfile}
                 />
