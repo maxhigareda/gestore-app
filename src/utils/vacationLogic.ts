@@ -1,63 +1,19 @@
-export const calculateVacationEntitlement = (dateOfEntry: string | null): number => {
-    if (!dateOfEntry) return 0;
+import type { VacationRequest } from './vacationLogic'; // Self reference fix if needed? No, definitions are here.
 
-    const entryDate = new Date(dateOfEntry);
-    const today = new Date();
-
-    let yearsOfService = today.getFullYear() - entryDate.getFullYear();
-
-    // Adjust if anniversary hasn't happened yet this year
-    const m = today.getMonth() - entryDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < entryDate.getDate())) {
-        yearsOfService--;
-    }
-
-    if (yearsOfService < 1) return 0; // Less than a year, maybe 0 or proportional? User said "1 year = 12 days" as base.
-
-    // Logic Table
-    // 1 año | 12 días
-    // 2 años | 14 días
-    // 3 años | 16 días
-    // 4 años | 18 días
-    // 5 años | 20 días
-    // 6 - 10 años | 22 días
-    // 11 - 15 años | 24 días
-    // 16 - 20 años | 26 días
-    // 21 - 25 años | 28 días
-    // 26 - 30 años | 30 días
-    // 31 - 35 años | 32 días
-
-    if (yearsOfService === 1) return 12;
-    if (yearsOfService === 2) return 14;
-    if (yearsOfService === 3) return 16;
-    if (yearsOfService === 4) return 18;
-    if (yearsOfService === 5) return 20;
-
-    if (yearsOfService >= 6 && yearsOfService <= 10) return 22;
-    if (yearsOfService >= 11 && yearsOfService <= 15) return 24;
-    if (yearsOfService >= 16 && yearsOfService <= 20) return 26;
-    if (yearsOfService >= 21 && yearsOfService <= 25) return 28;
-    if (yearsOfService >= 26 && yearsOfService <= 30) return 30;
-    if (yearsOfService >= 31 && yearsOfService <= 35) return 32;
-
-    return 32; // Cap at 32 or continue? Assuming cap for now or following pattern
-};
-
-// Table of entitlements
-// 1: 12, 2: 14, 3: 16, 4: 18, 5: 20
-// 6-10: 22, 11-15: 24, 16-20: 26, 21-25: 28, 26-30: 30, 31-35: 32
-const getDaysForYear = (yearNum: number): number => {
-    if (yearNum === 1) return 12;
-    if (yearNum === 2) return 14;
-    if (yearNum === 3) return 16;
-    if (yearNum === 4) return 18;
-    if (yearNum === 5) return 20;
-    if (yearNum >= 6 && yearNum <= 10) return 22;
-    if (yearNum >= 11 && yearNum <= 15) return 24;
-    if (yearNum >= 16 && yearNum <= 20) return 26;
-    if (yearNum >= 21 && yearNum <= 25) return 28;
-    if (yearNum >= 26 && yearNum <= 30) return 30;
-    if (yearNum >= 31 && yearNum <= 35) return 32;
+// Table of entitlements based on COMPLETED years
+const getDaysForYear = (yearsCompleted: number): number => {
+    if (yearsCompleted < 1) return 0; // First year working (0 completed) = 0 days available
+    if (yearsCompleted === 1) return 12;
+    if (yearsCompleted === 2) return 14;
+    if (yearsCompleted === 3) return 16;
+    if (yearsCompleted === 4) return 18;
+    if (yearsCompleted === 5) return 20;
+    if (yearsCompleted >= 6 && yearsCompleted <= 10) return 22;
+    if (yearsCompleted >= 11 && yearsCompleted <= 15) return 24;
+    if (yearsCompleted >= 16 && yearsCompleted <= 20) return 26;
+    if (yearsCompleted >= 21 && yearsCompleted <= 25) return 28;
+    if (yearsCompleted >= 26 && yearsCompleted <= 30) return 30;
+    if (yearsCompleted >= 31 && yearsCompleted <= 35) return 32;
     return 32;
 };
 
@@ -84,16 +40,34 @@ export interface VacationPeriod {
 export const calculateVacationPeriods = (dateOfEntryStr: string | null, requests: VacationRequest[]): VacationPeriod[] => {
     if (!dateOfEntryStr) return [];
 
-    // Normalize entry date to noon to avoid timezone shift issues roughly
-    const entryDate = new Date(dateOfEntryStr);
+    // Normalize entry date
+    // Append T12:00:00 to ensure we don't shift day due to timezone
+    // Or just split YYYY-MM-DD
+    const parts = dateOfEntryStr.split('-');
+    const entryYear = parseInt(parts[0]);
+    const entryMonth = parseInt(parts[1]) - 1; // 0-indexed
+    const entryDay = parseInt(parts[2]);
+
+    const entryDate = new Date(entryYear, entryMonth, entryDay);
     const today = new Date();
+
     const periods: VacationPeriod[] = [];
 
-    // Iterate from entry year to current year (or next anniversary)
-    // We define a period as AnniversaryYear to AnniversaryYear+1
-
+    // Start logic
     let loopDate = new Date(entryDate);
-    let yearCount = 1;
+    let yearsCompleted = 0;
+
+    // Calculate 100 years into future max to prevent infinite loops if something is wrong
+    // Stop when loopDate > today (meaning we have covered the current period)
+    // Wait, if today is 2026-02-05 and entry is 2021-07-12
+    // 2021 (0) -> 2022
+    // 2022 (1) -> 2023
+    // 2023 (2) -> 2024
+    // 2024 (3) -> 2025
+    // 2025 (4) -> 2026-07-12. Today fits here.
+
+    // Condition: We want to generate the period that CONTAINS today.
+    // So loop while start date of period <= today.
 
     while (loopDate <= today) {
         // Start of period
@@ -108,14 +82,15 @@ export const calculateVacationPeriods = (dateOfEntryStr: string | null, requests
         if (today >= start && today < end) {
             status = 'Actual';
         } else if (today < start) {
-            status = 'Futuro'; // Shouldn't happen in this loop usually unless we project ahead
+            status = 'Futuro';
         }
 
-        // Entitlement
-        const days = getDaysForYear(yearCount);
+        // Entitlement based on years completed AT START of this period
+        // For the first period (0-1 year), yearsCompleted is 0. Entitlement 0.
+        // For the 5th period (4-5 year), yearsCompleted is 4. Entitlement 18.
+        const days = getDaysForYear(yearsCompleted);
 
         // Calculations based on requests in this period
-        // Simplification: Request belongs to period if start_date is within [start, end)
         const requestsInPeriod = requests.filter(r => {
             const rStart = new Date(r.start_date);
             return rStart >= start && rStart < end;
@@ -129,8 +104,16 @@ export const calculateVacationPeriods = (dateOfEntryStr: string | null, requests
             .filter(r => r.status === 'Solicitada')
             .reduce((sum, r) => sum + r.days_requested, 0);
 
+        // Show period if it's the current one OR if yearsCompleted > 0 (meaning we have entitlement history)
+        // Or show all? Usually showing Year 0 with 0 days is fine for clarity "Antigüedad", but user might prefer hiding it.
+        // Let's show all for completeness, or at least from Year 1.
+        // If yearsCompleted === 0, days is 0.
+
+        // User requested: "hasta el 12 de julio cumplo 5... hasta ese día me salen las vacaciones de 4 años"
+        // This implies they expect to see the "4 year" period as the current/latest one.
+
         periods.push({
-            id: `period-${yearCount}`,
+            id: `period-${yearsCompleted}`, // Use completed years as ID
             period: `${start.getFullYear()}-${end.getFullYear()}`,
             start_date: start,
             end_date: end,
@@ -142,14 +125,8 @@ export const calculateVacationPeriods = (dateOfEntryStr: string | null, requests
 
         // Advance
         loopDate.setFullYear(loopDate.getFullYear() + 1);
-        yearCount++;
+        yearsCompleted++;
     }
-
-    // Special case: If we haven't reached "Actual" because today IS the anniversary or something?
-    // The loop runs while loopDate <= today. 
-    // Example: Entry 2020. Today 2024.
-    // loops: 2020-21 (V), 2021-22 (V), 2022-23 (V), 2023-24 (A if today < 2024 anniversary)
-    // If today is exactly 2024 anniversary, loopDate hits 2024. Body creates 2024-25. Status Actual.
 
     // We reverse to show newest first? Or oldest first? Usually Newest on top.
     return periods.reverse();
@@ -180,13 +157,7 @@ export const getVacationSummary = (periods: VacationPeriod[]): VacationSummary =
             accruedExpired += unused;
         } else if (p.status === 'Actual') {
             const available = p.days_entitled;
-            // Remaining = Available - Taken - Pending ?? User said "Restantes son las que me quedan sin solicitar"
-            // Usually "Remaining" means "Available to take"
-            // User: "Futuro serian todas las que solicité pero no me han aprobado"
-            // "Restantes son las qwu me quedan en este año sin solicitar" -> (Entitlement - Taken - Pending)??
-            // Or just (Entitlement - Taken)? 
-            // If I have 12, request 5 pending. Remaining? 12? or 7?
-            // "Sin solicitar" implies removing the solicited ones. So (Entitled - Taken - Pending).
+            // Balance logic: Available - Taken - Pending
             currentRemaining = Math.max(0, available - p.days_taken - p.days_pending);
         }
     });
