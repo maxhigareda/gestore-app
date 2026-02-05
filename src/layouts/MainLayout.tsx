@@ -6,7 +6,7 @@ import TopBar from '../components/TopBar';
 
 const MainLayout: React.FC = () => {
     return (
-        <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', border: '5px solid #00ff00', boxSizing: 'border-box', position: 'relative', zIndex: 9999 }}>
             {/* 1. Primary Sidebar (Icons) */}
             <PrimarySidebar />
 

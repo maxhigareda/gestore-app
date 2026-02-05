@@ -26,7 +26,9 @@ const PortalPage: React.FC = () => {
             display: 'grid',
             gridTemplateColumns: '350px 1fr',
             gap: '2rem',
-            height: '100%'
+            height: '100%',
+            border: '5px solid yellow',
+            backgroundColor: 'rgba(255, 255, 0, 0.1)'
         }}>
             {/* Left Column: Quick Actions */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>

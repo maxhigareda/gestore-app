@@ -28,7 +28,9 @@ const Login: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: 'var(--color-background)',
+            backgroundColor: 'var(--color-main-background)',
+            border: '5px solid red',
+            boxSizing: 'border-box',
             color: 'var(--color-text-primary)'
         }}>
             <div style={{
