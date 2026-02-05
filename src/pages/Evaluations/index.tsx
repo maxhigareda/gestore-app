@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { useAuth } from '../../context/AuthContext';
 import { Plus, CheckCircle, ExternalLink } from 'lucide-react';
 import AddEvaluationModal from './components/AddEvaluationModal';
+import EvaluationRunner from './components/EvaluationRunner';
 
 interface Evaluation {
     id: string;
