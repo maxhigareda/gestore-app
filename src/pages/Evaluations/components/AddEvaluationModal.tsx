@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { supabase } from '../../lib/supabaseClient';
+import { supabase } from '../../../lib/supabaseClient';
 import { X } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../../context/AuthContext';
 
 interface AddEvaluationModalProps {
     onClose: () => void;
