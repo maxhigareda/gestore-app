@@ -102,7 +102,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return (
         <AuthContext.Provider value={{ user, isAuthenticated: !!session, login, logout, isLoading }}>
-            {!isLoading && children}
+            {(!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) ? (
+                <div style={{ padding: '2rem', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', backgroundColor: '#1e1e1e', color: '#ff4d4f' }}>
+                    <h1 style={{ marginBottom: '1rem', fontSize: '2rem' }}>⚠️ Configuración Faltante</h1>
+                    <p style={{ maxWidth: '600px', lineHeight: '1.6', fontSize: '1.2rem' }}>
+                        No se detectaron las variables de entorno de Supabase en Vercel.
+                    </p>
+                    <div style={{ marginTop: '2rem', textAlign: 'left', backgroundColor: '#000', padding: '1.5rem', borderRadius: '8px', color: '#0f0', fontFamily: 'monospace' }}>
+                        VITE_SUPABASE_URL: {import.meta.env.VITE_SUPABASE_URL ? '✅ Definido' : '❌ Faltante'}<br />
+                        VITE_SUPABASE_ANON_KEY: {import.meta.env.VITE_SUPABASE_ANON_KEY ? '✅ Definido' : '❌ Faltante'}
+                    </div>
+                    <p style={{ marginTop: '2rem', color: '#aaa' }}>
+                        Por favor, ve a <strong>Vercel &gt; Settings &gt; Environment Variables</strong> y agrégalas.
+                    </p>
+                </div>
+            ) : (
+                !isLoading && children
+            )}
         </AuthContext.Provider>
     );
 };
