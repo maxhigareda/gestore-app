@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { UserProfile } from '../../../utils/mockData';
-import { Check, X, Save } from 'lucide-react';
+import React, { useState } from 'react';
+import type { UserProfile } from '../../../utils/mockData';
+import { X, Save } from 'lucide-react';
 import { supabase } from '../../../lib/supabaseClient';
 
 interface EditProfileModalProps {

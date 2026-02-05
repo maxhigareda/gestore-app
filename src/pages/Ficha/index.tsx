@@ -9,7 +9,6 @@ import { type UserProfile, MOCK_USER_PROFILE } from '../../utils/mockData';
 const FichaPage: React.FC = () => {
     const { user } = useAuth();
     const [profile, setProfile] = useState<UserProfile>(MOCK_USER_PROFILE);
-    const [loading, setLoading] = useState(true);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     useEffect(() => {
@@ -70,8 +69,6 @@ const FichaPage: React.FC = () => {
             }
         } catch (e) {
             console.error(e);
-        } finally {
-            setLoading(false);
         }
     };
 
