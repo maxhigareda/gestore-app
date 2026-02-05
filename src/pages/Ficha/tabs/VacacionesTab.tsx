@@ -36,10 +36,10 @@ const VacacionesTab: React.FC = () => {
     const fetchVacationData = async () => {
         if (!user) return;
         try {
-            // 1. Get Profile for Date of Entry
+            // 1. Get Profile for Date of Entry (Company)
             const { data: profile } = await supabase
                 .from('profiles')
-                .select('date_of_entry')
+                .select('company_entry_date')
                 .eq('id', user.id)
                 .single();
 
@@ -52,7 +52,7 @@ const VacacionesTab: React.FC = () => {
             if (reqError) throw reqError;
 
             // 3. Process Logic
-            const entryDate = profile?.date_of_entry;
+            const entryDate = profile?.company_entry_date;
             const typedRequests = (requestsData || []) as VacationRequest[]; // Ensure types match
 
             // If No requests, maybe add Dummy for UI demo if user insisted?
