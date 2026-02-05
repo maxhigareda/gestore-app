@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { useAuth } from '../../context/AuthContext';
-import { calculateVacationPeriods, getVacationSummary, VacationRequest } from '../../utils/vacationLogic';
+import { calculateVacationPeriods, getVacationSummary, type VacationRequest } from '../../utils/vacationLogic';
 import PersonalInfoCard from './components/PersonalInfoCard';
 import DetailsCard from './components/DetailsCard';
 import EditProfileModal from './components/EditProfileModal';
@@ -11,6 +11,7 @@ const FichaPage: React.FC = () => {
     const { user } = useAuth();
     const [profile, setProfile] = useState<UserProfile>(MOCK_USER_PROFILE);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (user) {
@@ -19,6 +20,11 @@ const FichaPage: React.FC = () => {
     }, [user]);
 
     const fetchProfile = async () => {
+        if (!user) {
+            setLoading(false);
+            return;
+        }
+
         try {
             const { data, error } = await supabase
                 .from('profiles')
@@ -28,7 +34,7 @@ const FichaPage: React.FC = () => {
 
             if (error) {
                 if (error.code === 'PGRST116') {
-                    // Profile doesn't exist? (Should be handled by SQL script, but just in case)
+                    // Profile doesn't exist
                     console.warn("Profile not found");
                     // Fallback to basic auth info if profile not found
                     setProfile(prev => ({
@@ -50,7 +56,7 @@ const FichaPage: React.FC = () => {
                     }));
                 }
             } else if (data) {
-                // Fetch Vacation Requests to calculate Balance
+                // Fetch Vacation Requests
                 const { data: reqs } = await supabase
                     .from('vacation_requests')
                     .select('*')
