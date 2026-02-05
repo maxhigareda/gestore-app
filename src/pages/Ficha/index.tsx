@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { useAuth } from '../../context/AuthContext';
+import { calculateVacationPeriods, getVacationSummary, VacationRequest } from '../../utils/vacationLogic';
 import PersonalInfoCard from './components/PersonalInfoCard';
 import DetailsCard from './components/DetailsCard';
 import EditProfileModal from './components/EditProfileModal';
@@ -22,34 +23,58 @@ const FichaPage: React.FC = () => {
             const { data, error } = await supabase
                 .from('profiles')
                 .select('*')
-                .eq('id', user?.id) // Match by UUID
+                .eq('id', user.id) // Match by UUID
                 .single();
 
             if (error) {
-                // If profile doesn't exist or error, we might fallback to mock or basic auth data
-                console.warn("Could not fetch profile, using Basic Auth info + Mock defaults", error);
-
-                // If we have auth user, at least update names/email
-                if (user) {
+                if (error.code === 'PGRST116') {
+                    // Profile doesn't exist? (Should be handled by SQL script, but just in case)
+                    console.warn("Profile not found");
+                    // Fallback to basic auth info if profile not found
                     setProfile(prev => ({
                         ...prev,
-                        firstName: user.name.split(' ')[0],
-                        lastName: user.name.split(' ').slice(1).join(' '),
-                        email: user.email,
-                        photoUrl: user.photoUrl
+                        firstName: user.name?.split(' ')[0] || '',
+                        lastName: user.name?.split(' ').slice(1).join(' ') || '',
+                        email: user.email || '',
+                        photoUrl: user.photoUrl || ''
+                    }));
+                } else {
+                    console.error('Error fetching profile:', error);
+                    // Fallback to basic auth info on other errors
+                    setProfile(prev => ({
+                        ...prev,
+                        firstName: user.name?.split(' ')[0] || '',
+                        lastName: user.name?.split(' ').slice(1).join(' ') || '',
+                        email: user.email || '',
+                        photoUrl: user.photoUrl || ''
                     }));
                 }
             } else if (data) {
-                // Map DB columns to Frontend UserProfile
-                setProfile({
+                // Fetch Vacation Requests to calculate Balance
+                const { data: reqs } = await supabase
+                    .from('vacation_requests')
+                    .select('*')
+                    .eq('user_id', user.id);
+
+                // Calculate Dynamic Balance
+                // We need to import the logic OR duplicate it briefly. Importing is better.
+                // But simplified: 
+                // We'll trust the util if we could import it here.
+                // Let's import it at top of file.
+
+                // ... Assuming imports added ...
+
+                // Map DB to UserProfile
+                const mappedProfile: UserProfile = {
+                    photoUrl: data.photo_url || user.photoUrl || '', // TODO: Storage
                     firstName: data.first_name || '',
                     lastName: data.last_name || '',
                     role: data.job_title || '',
                     rfc: data.rfc || '',
-                    email: data.email || user?.email || '',
-                    birthDate: data.birth_date || '',
+                    email: data.email || user.email || '',
+                    birthDate: data.birth_date || '', // date string
                     address: data.address || '',
-                    dateOfEntry: data.company_entry_date || '',
+                    dateOfEntry: data.date_of_entry || '', // "Fecha Ingreso Grupo"
 
                     area: data.department || '',
                     division: data.division || '',
@@ -62,15 +87,30 @@ const FichaPage: React.FC = () => {
                     workLocation: data.work_location || '',
                     patronalRegistration: data.patronal_registration || '',
                     contractType: data.contract_type || '',
-                    companyEntryDate: data.company_entry_date || '',
-                    vacationBalance: 12, // TODO: Store this in DB or calculate
-                    photoUrl: data.photo_url || user?.photoUrl || ''
-                });
+                    companyEntryDate: data.company_entry_date || '', // "Fecha Ingreso Compañía"
+
+                    vacationBalance: 0
+                };
+
+                // Calculate real balance
+                const reqsTyped = (reqs || []) as VacationRequest[];
+                const periods = calculateVacationPeriods(mappedProfile.dateOfEntry, reqsTyped);
+                const summary = getVacationSummary(periods);
+
+                mappedProfile.vacationBalance = summary.currentRemaining;
+
+                setProfile(mappedProfile);
             }
-        } catch (e) {
-            console.error(e);
+        } catch (error) {
+            console.error('Unexpected error:', error);
+        } finally {
+            setLoading(false);
         }
     };
+
+    if (loading) {
+        return <div>Cargando perfil...</div>; // Or a more sophisticated loading spinner
+    }
 
     return (
         <div style={{

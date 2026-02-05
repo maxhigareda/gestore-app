@@ -7,6 +7,14 @@ interface PersonalInfoCardProps {
     onEdit: () => void;
 }
 
+const formatDate = (dateStr?: string) => {
+    if (!dateStr) return 'N/A';
+    // Handle yyyy-mm-dd to dd/mm/yyyy
+    const parts = dateStr.split('-');
+    if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    return dateStr;
+};
+
 const PersonalInfoCard: React.FC<PersonalInfoCardProps> = ({ user, onEdit }) => {
     const age = calculateAge(user.birthDate);
     const initials = user.firstName.charAt(0) + user.lastName.charAt(0);
@@ -86,9 +94,9 @@ const PersonalInfoCard: React.FC<PersonalInfoCardProps> = ({ user, onEdit }) => 
 
                 <InfoRow label="RFC" value={user.rfc} />
                 <InfoRow label="Correo Corporativo" value={user.email} />
-                <InfoRow label="Cumpleaños" value={`${user.birthDate} (${age} años)`} />
+                <InfoRow label="Cumpleaños" value={`${formatDate(user.birthDate)} (${age} años)`} />
                 <InfoRow label="Dirección" value={user.address} />
-                <InfoRow label="Fecha de Ingreso" value={user.dateOfEntry} />
+                <InfoRow label="Fecha de Ingreso" value={formatDate(user.dateOfEntry)} />
             </div>
         </div>
     );

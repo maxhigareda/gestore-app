@@ -19,7 +19,7 @@ const ResumenTab: React.FC<ResumenTabProps> = ({ user }) => {
         { label: 'Ubicación', value: user.workLocation },
         { label: 'Registro Patronal', value: user.patronalRegistration },
         { label: 'Tipo de Contrato', value: user.contractType },
-        { label: 'Fecha de Ingreso', value: user.companyEntryDate },
+        { label: 'Fecha de Ingreso', value: user.companyEntryDate ? user.companyEntryDate.split('-').reverse().join('/') : '' },
         { label: 'Saldo de Vacaciones', value: `${user.vacationBalance} días` },
     ];
 

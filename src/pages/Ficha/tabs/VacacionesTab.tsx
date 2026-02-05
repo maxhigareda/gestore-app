@@ -5,14 +5,14 @@ import { useAuth } from '../../../context/AuthContext';
 import {
     calculateVacationPeriods,
     getVacationSummary,
-    VacationPeriod,
-    VacationRequest
+    type VacationPeriod,
+    type VacationRequest
 } from '../../../utils/vacationLogic';
 
 // Use this for the "Requests" table to keep it dummy/clean for now but wired to real types
 // User wants "buttons to work" even if data is dummy?
 // For now, let's fetch REAL requests. If empty, it's empty.
-// IF user wants dummy data visible, I'll initialize state with MOCK if empty? 
+// IF user wants dummy data visible, I'll initialize state with MOCK if empty?
 // User: "La parte de vacaciones tomadas deja la info dummie... pero si crea la o las tablas... y que los botones de opcions funcionen"
 // This is tricky. I'll read from DB. If empty, I'll insert a Dummy row locally for display?
 // Or I'll just rely on DB and tell user to create one.
@@ -57,18 +57,18 @@ const VacacionesTab: React.FC = () => {
 
             // If No requests, maybe add Dummy for UI demo if user insisted?
             // "deja la info dummie" -> Let's append dummy info to typedRequests ONLY IF empty
-            const displayRequests = typedRequests.length > 0 ? typedRequests : MOCK_DISPLAY_REQUESTS;
+            // const displayRequests = typedRequests.length > 0 ? typedRequests : MOCK_DISPLAY_REQUESTS;
 
             // BUT for CALCULATIONS, we must use ONLY REAL requests to avoid messing up the summary numbers
             // or we use the dummy ones if we want to simulate the user experience?
             // "Mis acumuladas seria 60... Tomadas serian los días que he solicitado"
             // If I use Mocks for display, I should probably use Mocks for Calc to match the UI numbers.
 
-            // Let's assume we use REAL DB data for everything. 
-            // If the user wants to see "Dummy Info", I will render MOCK_DISPLAY_REQUESTS in the table 
+            // Let's assume we use REAL DB data for everything.
+            // If the user wants to see "Dummy Info", I will render MOCK_DISPLAY_REQUESTS in the table
             // BUT I will calculate summary based on MOCK_DISPLAY_REQUESTS too so it looks consistent.
-            // Wait, simpler: USE REAL DATA. Tell user to add a request to see it. 
-            // Risk: Users says "Leave info dummie". 
+            // Wait, simpler: USE REAL DATA. Tell user to add a request to see it.
+            // Risk: Users says "Leave info dummie".
             // Compromise: I will use the `MOCK_DISPLAY_REQUESTS` if DB is empty, effectively "leaving dummy info".
 
             const reqsToUse = typedRequests.length > 0 ? typedRequests : MOCK_DISPLAY_REQUESTS;
