@@ -1,6 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { User } from '../utils/mockData'; // Keeping User type for now, but mapping from Supabase
+
+export interface User {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    photoUrl?: string;
+    department?: string;
+    location?: string;
+    joinDate?: string;
+}
 
 interface AuthContextType {
     user: User | null;
