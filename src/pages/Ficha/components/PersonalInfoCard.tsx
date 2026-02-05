@@ -4,9 +4,10 @@ import { type UserProfile, calculateAge } from '../../../utils/mockData';
 
 interface PersonalInfoCardProps {
     user: UserProfile;
+    onEdit: () => void;
 }
 
-const PersonalInfoCard: React.FC<PersonalInfoCardProps> = ({ user }) => {
+const PersonalInfoCard: React.FC<PersonalInfoCardProps> = ({ user, onEdit }) => {
     const age = calculateAge(user.birthDate);
     const initials = user.firstName.charAt(0) + user.lastName.charAt(0);
 
@@ -68,6 +69,7 @@ const PersonalInfoCard: React.FC<PersonalInfoCardProps> = ({ user }) => {
                 }}
                     onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-primary)'; e.currentTarget.style.color = '#fff'; }}
                     onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--color-text-secondary)'; }}
+                    onClick={onEdit}
                 >
                     <Edit2 size={14} />
                     Actualizar datos

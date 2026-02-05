@@ -107,7 +107,7 @@ const AddEvaluationModal: React.FC<AddEvaluationModalProps> = ({ onClose, onSucc
                     setIsSubmitting(false);
                 }
             },
-            error: (error) => {
+            error: () => {
                 setStatus('error');
                 setStatusMessage("Error al leer el archivo CSV.");
                 setIsSubmitting(false);

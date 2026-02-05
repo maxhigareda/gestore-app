@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import { useAuth } from '../../../context/AuthContext';
-import { CheckCircle, AlertCircle, ArrowLeft, ArrowRight, Save } from 'lucide-react';
+import { CheckCircle, X, ArrowLeft, ArrowRight, Save } from 'lucide-react';
 
 interface Question {
     id: string;
@@ -214,7 +214,7 @@ const EvaluationRunner: React.FC<EvaluationRunnerProps> = ({ evaluationId, evalu
                         }}
                         title="Cerrar Evaluación"
                     >
-                        <AlertCircle size={18} />
+                        <X size={18} />
                     </button>
                 </div>
 
