@@ -5,7 +5,7 @@ const TopBar: React.FC = () => {
     const { user } = useAuth();
 
     // Create initials or use first char
-    const initial = user?.firstName?.charAt(0) || 'U';
+    const initial = user?.name?.charAt(0) || 'U';
 
     return (
         <header style={{
@@ -34,7 +34,7 @@ const TopBar: React.FC = () => {
                 }}>
                     {!user?.photoUrl && initial}
                 </div>
-                <span style={{ fontSize: '14px', fontWeight: 500 }}>{user?.firstName}</span>
+                <span style={{ fontSize: '14px', fontWeight: 500 }}>{user?.name.split(' ')[0]}</span>
             </div>
         </header>
     );
