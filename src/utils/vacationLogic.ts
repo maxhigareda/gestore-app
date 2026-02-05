@@ -1,4 +1,3 @@
-import type { VacationRequest } from './vacationLogic'; // Self reference fix if needed? No, definitions are here.
 
 // Table of entitlements based on COMPLETED years
 const getDaysForYear = (yearsCompleted: number): number => {
@@ -40,9 +39,6 @@ export interface VacationPeriod {
 export const calculateVacationPeriods = (dateOfEntryStr: string | null, requests: VacationRequest[]): VacationPeriod[] => {
     if (!dateOfEntryStr) return [];
 
-    // Normalize entry date
-    // Append T12:00:00 to ensure we don't shift day due to timezone
-    // Or just split YYYY-MM-DD
     const parts = dateOfEntryStr.split('-');
     const entryYear = parseInt(parts[0]);
     const entryMonth = parseInt(parts[1]) - 1; // 0-indexed
@@ -53,21 +49,8 @@ export const calculateVacationPeriods = (dateOfEntryStr: string | null, requests
 
     const periods: VacationPeriod[] = [];
 
-    // Start logic
     let loopDate = new Date(entryDate);
     let yearsCompleted = 0;
-
-    // Calculate 100 years into future max to prevent infinite loops if something is wrong
-    // Stop when loopDate > today (meaning we have covered the current period)
-    // Wait, if today is 2026-02-05 and entry is 2021-07-12
-    // 2021 (0) -> 2022
-    // 2022 (1) -> 2023
-    // 2023 (2) -> 2024
-    // 2024 (3) -> 2025
-    // 2025 (4) -> 2026-07-12. Today fits here.
-
-    // Condition: We want to generate the period that CONTAINS today.
-    // So loop while start date of period <= today.
 
     while (loopDate <= today) {
         // Start of period
@@ -86,8 +69,6 @@ export const calculateVacationPeriods = (dateOfEntryStr: string | null, requests
         }
 
         // Entitlement based on years completed AT START of this period
-        // For the first period (0-1 year), yearsCompleted is 0. Entitlement 0.
-        // For the 5th period (4-5 year), yearsCompleted is 4. Entitlement 18.
         const days = getDaysForYear(yearsCompleted);
 
         // Calculations based on requests in this period
@@ -104,16 +85,8 @@ export const calculateVacationPeriods = (dateOfEntryStr: string | null, requests
             .filter(r => r.status === 'Solicitada')
             .reduce((sum, r) => sum + r.days_requested, 0);
 
-        // Show period if it's the current one OR if yearsCompleted > 0 (meaning we have entitlement history)
-        // Or show all? Usually showing Year 0 with 0 days is fine for clarity "Antigüedad", but user might prefer hiding it.
-        // Let's show all for completeness, or at least from Year 1.
-        // If yearsCompleted === 0, days is 0.
-
-        // User requested: "hasta el 12 de julio cumplo 5... hasta ese día me salen las vacaciones de 4 años"
-        // This implies they expect to see the "4 year" period as the current/latest one.
-
         periods.push({
-            id: `period-${yearsCompleted}`, // Use completed years as ID
+            id: `period-${yearsCompleted}`,
             period: `${start.getFullYear()}-${end.getFullYear()}`,
             start_date: start,
             end_date: end,
@@ -128,7 +101,7 @@ export const calculateVacationPeriods = (dateOfEntryStr: string | null, requests
         yearsCompleted++;
     }
 
-    // We reverse to show newest first? Or oldest first? Usually Newest on top.
+    // We reverse to show newest first
     return periods.reverse();
 };
 
@@ -152,8 +125,12 @@ export const getVacationSummary = (periods: VacationPeriod[]): VacationSummary =
         totalTaken += p.days_taken;
         future += p.days_pending;
 
+        // Math consistency: Entitled = Taken + Pending + Expired + Remaining
         if (p.status === 'Vencido') {
-            const unused = Math.max(0, p.days_entitled - p.days_taken);
+            // If expired, whatever wasn't taken or pending is lost (expired)
+            // Note: If you have a pending request in an expired period, it's counted in 'future'
+            // properly, and removed from expired to avoid double counting.
+            const unused = Math.max(0, p.days_entitled - p.days_taken - p.days_pending);
             accruedExpired += unused;
         } else if (p.status === 'Actual') {
             const available = p.days_entitled;
