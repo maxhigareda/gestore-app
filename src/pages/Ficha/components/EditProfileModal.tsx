@@ -22,15 +22,18 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onSa
         e.preventDefault();
         setSaving(true);
         try {
+            // Helper: Convert empty strings to null for Date fields to avoid DB errors
+            const sanitizeDate = (dateStr?: string) => (dateStr && dateStr.trim() !== '') ? dateStr : null;
+
             // Map UserProfile fields to Supabase DB columns
             const updates = {
                 first_name: formData.firstName,
                 last_name: formData.lastName,
                 job_title: formData.role,
                 rfc: formData.rfc,
-                birth_date: formData.birthDate,
+                birth_date: sanitizeDate(formData.birthDate),
                 address: formData.address,
-                company_entry_date: formData.dateOfEntry,
+                company_entry_date: sanitizeDate(formData.dateOfEntry),
 
                 department: formData.area, // Mapping 'area' to department
                 division: formData.division,
@@ -50,14 +53,15 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onSa
             const { error } = await supabase
                 .from('profiles')
                 .update(updates)
-                .eq('email', formData.email); // Assuming we can match by email or ID. Ideally ID.
+                .eq('email', formData.email); // Assuming we can match by email or ID.
 
             if (error) throw error;
             onSave();
             onClose();
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error updating profile:', error);
-            alert('Error al guardar cambios.');
+            // Show detailed error message
+            alert(`Error al guardar: ${error.message || 'Verifica los datos e intenta de nuevo.'}`);
         } finally {
             setSaving(false);
         }
