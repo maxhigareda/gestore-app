@@ -23,38 +23,42 @@ const ProtectedRoute = () => {
   return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
+import ErrorBoundary from './components/ErrorBoundary';
+
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
+    <ErrorBoundary>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
 
-          <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<MainLayout />}>
-              {/* Default redirect to Portal or Dashboard */}
-              <Route index element={<Navigate to="/portal" replace />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/" element={<MainLayout />}>
+                {/* Default redirect to Portal or Dashboard */}
+                <Route index element={<Navigate to="/portal" replace />} />
 
-              {/* Home Module Routes */}
-              <Route path="portal" element={<PortalPage />} />
-              <Route path="ficha" element={<FichaPage />} />
-              <Route path="team" element={<PlaceholderPage title="Mi Equipo" />} />
-              <Route path="surveys" element={<PlaceholderPage title="Mis Encuestas" />} />
-              <Route path="training-my" element={<TrainingPage />} />
-              <Route path="evaluations" element={<EvaluationsPage />} />
-              <Route path="recognition" element={<PlaceholderPage title="Reconocimientos" />} />
-              <Route path="org-chart" element={<PlaceholderPage title="Organigrama" />} />
-              <Route path="directory" element={<DirectoryPage />} />
+                {/* Home Module Routes */}
+                <Route path="portal" element={<PortalPage />} />
+                <Route path="ficha" element={<FichaPage />} />
+                <Route path="team" element={<PlaceholderPage title="Mi Equipo" />} />
+                <Route path="surveys" element={<PlaceholderPage title="Mis Encuestas" />} />
+                <Route path="training-my" element={<TrainingPage />} />
+                <Route path="evaluations" element={<EvaluationsPage />} />
+                <Route path="recognition" element={<PlaceholderPage title="Reconocimientos" />} />
+                <Route path="org-chart" element={<PlaceholderPage title="Organigrama" />} />
+                <Route path="directory" element={<DirectoryPage />} />
 
-              {/* Other Module Placeholders */}
-              <Route path="admin/*" element={<PlaceholderPage title="Módulo Administrativo" />} />
-              <Route path="org-dev/*" element={<PlaceholderPage title="Desarrollo Organizacional" />} />
-              <Route path="training/*" element={<PlaceholderPage title="Gestión de Capacitaciones" />} />
+                {/* Other Module Placeholders */}
+                <Route path="admin/*" element={<PlaceholderPage title="Módulo Administrativo" />} />
+                <Route path="org-dev/*" element={<PlaceholderPage title="Desarrollo Organizacional" />} />
+                <Route path="training/*" element={<PlaceholderPage title="Gestión de Capacitaciones" />} />
+              </Route>
             </Route>
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
