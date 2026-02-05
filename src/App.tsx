@@ -7,9 +7,19 @@ import FichaPage from './pages/Ficha';
 import EvaluationsPage from './pages/Evaluations';
 import PortalPage from './pages/Portal';
 import TrainingPage from './pages/Training';
+import DirectoryPage from './pages/Directory';
 
 const ProtectedRoute = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        Cargando...
+      </div>
+    );
+  }
+
   return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
@@ -34,7 +44,7 @@ function App() {
               <Route path="evaluations" element={<EvaluationsPage />} />
               <Route path="recognition" element={<PlaceholderPage title="Reconocimientos" />} />
               <Route path="org-chart" element={<PlaceholderPage title="Organigrama" />} />
-              <Route path="directory" element={<PlaceholderPage title="Directorio" />} />
+              <Route path="directory" element={<DirectoryPage />} />
 
               {/* Other Module Placeholders */}
               <Route path="admin/*" element={<PlaceholderPage title="Módulo Administrativo" />} />
