@@ -67,7 +67,7 @@ const EvaluationsPage: React.FC = () => {
     };
 
     return (
-        <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ height: 'calc(100vh - var(--topbar-height, 60px) - 40px)', display: 'flex', flexDirection: 'column' }}>
             <div style={{
                 padding: '0 0.5rem 1.5rem 0.5rem',
                 display: 'flex',
