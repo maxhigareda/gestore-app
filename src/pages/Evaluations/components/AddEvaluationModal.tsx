@@ -48,6 +48,7 @@ const AddEvaluationModal: React.FC<AddEvaluationModalProps> = ({ onClose, onSucc
         Papa.parse(file, {
             header: true,
             skipEmptyLines: true,
+            encoding: "ISO-8859-1", // Fix for Spanish accents in Excel CSVs
             complete: async (results) => {
                 try {
                     setStatus('uploading');
