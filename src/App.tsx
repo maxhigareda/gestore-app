@@ -14,8 +14,8 @@ const ProtectedRoute = () => {
 
   if (isLoading) {
     return (
-      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        Cargando...
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#500000', color: 'white', fontSize: '2rem' }}>
+        DEBUG: Cargando... (Si ves esto, Auth está cargando)
       </div>
     );
   }

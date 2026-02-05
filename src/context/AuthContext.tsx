@@ -51,7 +51,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
         });
 
-        return () => subscription.unsubscribe();
+        // 3. Safety Timeout (Fallback)
+        const timeout = setTimeout(() => {
+            setIsLoading(prev => {
+                if (prev) {
+                    console.warn("Auth check timed out, forcing load.");
+                    return false;
+                }
+                return prev;
+            });
+        }, 5000); // 5 seconds
+
+        return () => {
+            subscription.unsubscribe();
+            clearTimeout(timeout);
+        };
     }, []);
 
     const mapUser = (supabaseUser: any) => {
