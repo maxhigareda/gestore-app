@@ -9,7 +9,6 @@ interface Evaluation {
     id: string;
     title: string;
     description: string;
-    form_url: string;
     target_area: string;
     created_at: string;
 }
@@ -19,15 +18,14 @@ const EvaluationsPage: React.FC = () => {
     const [evaluations, setEvaluations] = useState<Evaluation[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [userArea, setUserArea] = useState('General'); // Need to fetch real user area
+    const [userArea, setUserArea] = useState('General');
+    const [activeExam, setActiveExam] = useState<Evaluation | null>(null);
 
     useEffect(() => {
-        // 1. Fetch User Profile to get Area
         fetchUserArea();
     }, [user]);
 
     useEffect(() => {
-        // 2. Fetch Evaluations once we have the area
         if (userArea) {
             fetchEvaluations();
         }
@@ -36,14 +34,14 @@ const EvaluationsPage: React.FC = () => {
     const fetchUserArea = async () => {
         if (!user) return;
         try {
-            const { data, error } = await supabase
+            const { data } = await supabase
                 .from('profiles')
                 .select('department')
                 .eq('id', user.id)
                 .single();
 
             if (data) {
-                setUserArea(data.department || 'General'); // Assuming 'department' matches our 'Area' concept or is close enough
+                setUserArea(data.department || 'General');
             }
         } catch (e) {
             console.error("Could not fetch user area", e);
@@ -53,7 +51,6 @@ const EvaluationsPage: React.FC = () => {
     const fetchEvaluations = async () => {
         setLoading(true);
         try {
-            // Logic: Show General evaluations OR evaluations for my specific area
             const { data, error } = await supabase
                 .from('evaluations')
                 .select('*')
@@ -71,7 +68,6 @@ const EvaluationsPage: React.FC = () => {
 
     return (
         <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            {/* Header */}
             <div style={{
                 padding: '0 0.5rem 1.5rem 0.5rem',
                 display: 'flex',
@@ -85,7 +81,6 @@ const EvaluationsPage: React.FC = () => {
                     </p>
                 </div>
 
-                {/* Only show Add button if needed. For now, showing to everyone for simplicity as per request */}
                 <button
                     onClick={() => setIsModalOpen(true)}
                     style={{
@@ -102,11 +97,10 @@ const EvaluationsPage: React.FC = () => {
                     }}
                 >
                     <Plus size={18} />
-                    Nueva Evaluación
+                    Importar Evaluación
                 </button>
             </div>
 
-            {/* Content */}
             <div style={{ flex: 1, overflowY: 'auto', padding: '0.5rem' }}>
                 {loading ? (
                     <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-muted)' }}>Cargando...</div>
@@ -160,10 +154,8 @@ const EvaluationsPage: React.FC = () => {
                                     </p>
                                 </div>
 
-                                <a
-                                    href={eva.form_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                <button
+                                    onClick={() => setActiveExam(eva)}
                                     style={{
                                         marginTop: 'auto',
                                         display: 'flex',
@@ -171,20 +163,18 @@ const EvaluationsPage: React.FC = () => {
                                         justifyContent: 'center',
                                         gap: '8px',
                                         padding: '10px',
-                                        backgroundColor: 'var(--color-background)',
-                                        color: 'var(--color-text-primary)',
-                                        textDecoration: 'none',
-                                        border: '1px solid var(--border-color)',
+                                        backgroundColor: 'var(--color-primary)',
+                                        color: 'white',
+                                        border: 'none',
                                         borderRadius: '6px',
                                         fontWeight: 500,
-                                        transition: 'background-color 0.2s'
+                                        cursor: 'pointer',
+                                        transition: 'opacity 0.2s'
                                     }}
-                                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--color-border)'}
-                                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'var(--color-background)'}
                                 >
-                                    Ir a la Encuesta
+                                    Contestar Ahora
                                     <ExternalLink size={16} />
-                                </a>
+                                </button>
                             </div>
                         ))}
                     </div>
@@ -195,6 +185,18 @@ const EvaluationsPage: React.FC = () => {
                 <AddEvaluationModal
                     onClose={() => setIsModalOpen(false)}
                     onSuccess={fetchEvaluations}
+                />
+            )}
+
+            {activeExam && (
+                <EvaluationRunner
+                    evaluationId={activeExam.id}
+                    evaluationTitle={activeExam.title}
+                    onClose={() => setActiveExam(null)}
+                    onComplete={() => {
+                        setActiveExam(null);
+                        fetchEvaluations();
+                    }}
                 />
             )}
         </div>
