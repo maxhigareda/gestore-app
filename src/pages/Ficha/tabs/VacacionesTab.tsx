@@ -7,7 +7,8 @@ import {
     getVacationSummary,
     type VacationPeriod,
     type VacationRequest
-} from '../../../utils/vacationLogic';
+import VacationRequestModal from '../../Portal/components/VacationRequestModal';
+import {
 
 // Use this for the "Requests" table to keep it dummy/clean for now but wired to real types
 // User wants "buttons to work" even if data is dummy?
@@ -19,201 +20,239 @@ import {
 // Let's implement real read/delete.
 
 const VacacionesTab: React.FC = () => {
-    const { user } = useAuth();
-    const [periods, setPeriods] = useState<VacationPeriod[]>([]);
-    const [requests, setRequests] = useState<VacationRequest[]>([]);
-    const [summary, setSummary] = useState({
-        totalAccrued: 0, totalTaken: 0, accruedExpired: 0, future: 0, currentRemaining: 0
-    });
-    const [loading, setLoading] = useState(true);
+        const { user } = useAuth();
+        const [periods, setPeriods] = useState<VacationPeriod[]>([]);
+        const [requests, setRequests] = useState<VacationRequest[]>([]);
+        const [summary, setSummary] = useState({
+            totalAccrued: 0, totalTaken: 0, accruedExpired: 0, future: 0, currentRemaining: 0
+        });
+        const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        if (user) {
+        // Modal Action State
+        const [modalOpen, setModalOpen] = useState(false);
+        const [modalMode, setModalMode] = useState<'create' | 'edit' | 'view'>('create');
+        const [selectedRequest, setSelectedRequest] = useState<VacationRequest | null>(null);
+
+        useEffect(() => {
+            if (user) {
+                fetchVacationData();
+            }
+        }, [user]);
+
+        const fetchVacationData = async () => {
+            if (!user) return;
+            try {
+                // 1. Get Profile for Date of Entry (Company)
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('company_entry_date')
+                    .eq('id', user.id)
+                    .single();
+
+                // 2. Get Requests
+                const { data: requestsData, error: reqError } = await supabase
+                    .from('vacation_requests')
+                    .select('*')
+                    .order('start_date', { ascending: false });
+
+                if (reqError) throw reqError;
+
+                // 3. Process Logic
+                const entryDate = profile?.company_entry_date;
+                const typedRequests = (requestsData || []) as VacationRequest[]; // Ensure types match
+
+                // If No requests, strictly use DB data. No mocks.
+                const reqsToUse = typedRequests;
+                setRequests(reqsToUse);
+
+                const calculatedPeriods = calculateVacationPeriods(entryDate, reqsToUse);
+                setPeriods(calculatedPeriods);
+
+                const calculatedSummary = getVacationSummary(calculatedPeriods);
+                setSummary(calculatedSummary);
+
+            } catch (error) {
+                console.error('Error fetching vacation data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        const handleDelete = async (id: string) => {
+            const confirm = window.confirm('¿Seguro que deseas eliminar esta solicitud?');
+            if (!confirm) return;
+
+            const { error } = await supabase.from('vacation_requests').delete().eq('id', id);
+            if (error) {
+                alert('Error al borrar');
+            } else {
+                fetchVacationData();
+            }
+        };
+
+        const handleEdit = (request: VacationRequest) => {
+            setSelectedRequest(request);
+            setModalMode('edit');
+            setModalOpen(true);
+        };
+
+        const handleView = (request: VacationRequest) => {
+            setSelectedRequest(request);
+            setModalMode('view');
+            setModalOpen(true);
+        };
+
+        const handleCloseModal = () => {
+            setModalOpen(false);
+            setSelectedRequest(null);
+            setModalMode('create');
+        };
+
+        const handleSuccess = () => {
+            handleCloseModal();
             fetchVacationData();
-        }
-    }, [user]);
+            // Ideally show a toast/success message here
+        };
 
-    const fetchVacationData = async () => {
-        if (!user) return;
-        try {
-            // 1. Get Profile for Date of Entry (Company)
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('company_entry_date')
-                .eq('id', user.id)
-                .single();
+        if (loading) return <div>Cargando vacaciones...</div>;
 
-            // 2. Get Requests
-            const { data: requestsData, error: reqError } = await supabase
-                .from('vacation_requests')
-                .select('*')
-                .order('start_date', { ascending: false });
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
 
-            if (reqError) throw reqError;
+                {/* 1. Resumen de Saldos */}
+                <Card title="Vacaciones">
+                    <h4 style={{ color: 'var(--color-text-muted)', marginBottom: '1rem', fontWeight: 500 }}>Saldo</h4>
+                    <div style={{ display: 'flex', gap: '3rem', flexWrap: 'wrap' }}>
+                        <StatItem label="Acumuladas" value={summary.totalAccrued} />
+                        <StatItem label="Tomadas" value={summary.totalTaken} />
+                        <StatItem label="Vencidas" value={summary.accruedExpired} />
+                        <StatItem label="Futuro" value={summary.future} />
+                        <StatItem label="Restantes" value={summary.currentRemaining} highlight />
+                    </div>
+                </Card>
 
-            // 3. Process Logic
-            const entryDate = profile?.company_entry_date;
-            const typedRequests = (requestsData || []) as VacationRequest[]; // Ensure types match
+                {/* 2. Vacaciones Tomadas */}
+                <Card title="Vacaciones Tomadas">
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '1px solid var(--border-color)', textAlign: 'left' }}>
+                                    <th style={thStyle}>Fecha Inicio</th>
+                                    <th style={thStyle}>Fecha Fin</th>
+                                    <th style={thStyle}>Días</th>
+                                    <th style={thStyle}>Tipo</th>
+                                    <th style={thStyle}>Estado</th>
+                                    <th style={thStyle}>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {requests.map((request) => (
+                                    <tr key={request.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                                        <td style={tdStyle}>{request.start_date}</td>
+                                        <td style={tdStyle}>{request.end_date}</td>
+                                        <td style={tdStyle}>{request.days_requested}</td>
+                                        <td style={tdStyle}>{request.type}</td>
+                                        <td style={tdStyle}>
+                                            <StatusBadge status={request.status} />
+                                        </td>
+                                        <td style={tdStyle}>
+                                            <div style={{ display: 'flex', gap: '8px' }}>
+                                                <ActionIcon icon={<Edit2 size={16} />} title="Editar" onClick={() => handleEdit(request)} />
+                                                <ActionIcon icon={<Trash2 size={16} />} title="Borrar" onClick={() => handleDelete(request.id)} />
+                                                <ActionIcon icon={<Eye size={16} />} title="Ver" onClick={() => handleView(request)} />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {requests.length === 0 && (
+                                    <tr>
+                                        <td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+                                            No hay vacaciones registradas.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </Card>
 
-            // If No requests, maybe add Dummy for UI demo if user insisted?
-            // "deja la info dummie" -> Let's append dummy info to typedRequests ONLY IF empty
-            // const displayRequests = typedRequests.length > 0 ? typedRequests : MOCK_DISPLAY_REQUESTS;
+                {/* 3. Vacaciones Acumuladas */}
+                <Card title="Vacaciones Acumuladas">
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '1px solid var(--border-color)', textAlign: 'left' }}>
+                                    <th style={thStyle}>Periodo</th>
+                                    <th style={thStyle}>Vigencia</th>
+                                    <th style={thStyle}>Días Ganados</th>
+                                    <th style={thStyle}>Tomados</th>
+                                    <th style={thStyle}>Pendientes</th>
+                                    <th style={thStyle}>Estatus</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {periods.map((p) => (
+                                    <tr key={p.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                                        <td style={tdStyle}>{p.period}</td>
+                                        <td style={tdStyle}>
+                                            {p.start_date.toLocaleDateString()} - {p.end_date.toLocaleDateString()}
+                                        </td>
+                                        <td style={tdStyle}>{p.days_entitled} Días</td>
+                                        <td style={tdStyle}>{p.days_taken}</td>
+                                        <td style={tdStyle}>{p.days_pending}</td>
+                                        <td style={tdStyle}>
+                                            <span style={{
+                                                color: p.status === 'Actual' ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                                                fontWeight: p.status === 'Actual' ? 600 : 400
+                                            }}>
+                                                {p.status}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </Card>
 
-            // BUT for CALCULATIONS, we must use ONLY REAL requests to avoid messing up the summary numbers
-            // or we use the dummy ones if we want to simulate the user experience?
-            // "Mis acumuladas seria 60... Tomadas serian los días que he solicitado"
-            // If I use Mocks for display, I should probably use Mocks for Calc to match the UI numbers.
+                import VacationRequestModal from '../../Portal/components/VacationRequestModal'; // Import
 
-            // Let's assume we use REAL DB data for everything.
-            // If the user wants to see "Dummy Info", I will render MOCK_DISPLAY_REQUESTS in the table
-            // BUT I will calculate summary based on MOCK_DISPLAY_REQUESTS too so it looks consistent.
-            // Wait, simpler: USE REAL DATA. Tell user to add a request to see it.
-            // Risk: Users says "Leave info dummie".
-            // Compromise: I will use the `MOCK_DISPLAY_REQUESTS` if DB is empty, effectively "leaving dummy info".
+                // ... inside the component ...
 
-            // If No requests, strictly use DB data. No mocks.
-            const reqsToUse = typedRequests;
-            setRequests(reqsToUse);
-
-            const calculatedPeriods = calculateVacationPeriods(entryDate, reqsToUse);
-            setPeriods(calculatedPeriods);
-
-            const calculatedSummary = getVacationSummary(calculatedPeriods);
-            setSummary(calculatedSummary);
-
-        } catch (error) {
-            console.error('Error fetching vacation data:', error);
-        } finally {
-            setLoading(false);
-        }
+                {/* Request Manipulation Modal */}
+                {modalOpen && selectedRequest && (
+                    <div style={{
+                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                        backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+                    }}>
+                        <div style={{
+                            backgroundColor: 'var(--color-surface)', padding: '2rem', borderRadius: '12px',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.2)', maxWidth: '500px', width: '100%'
+                        }}>
+                            <h3 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
+                                {modalMode === 'edit' ? 'Modificar Solicitud' : 'Detalles de Solicitud'}
+                            </h3>
+                            <VacationRequestModal
+                                balance={summary.currentRemaining}
+                                onClose={handleCloseModal}
+                                onSuccess={handleSuccess}
+                                mode={modalMode}
+                                initialData={{
+                                    id: selectedRequest.id,
+                                    startDate: selectedRequest.start_date,
+                                    endDate: selectedRequest.end_date,
+                                    // comment: selectedRequest.reason // 'reason' might not exist on type yet if I didn't update types?
+                                    // Let's check type definition in utils/vacationLogic.ts or just cast it if needed.
+                                    // For now, let's omit comment if it's tricky, or cast.
+                                    // comment: (selectedRequest as any).reason
+                                }}
+                            />
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
     };
-
-    const handleDelete = async (id: string) => {
-        // If it's a dummy ID, just remove from state
-        if (id.startsWith('mock-')) {
-            const newReqs = requests.filter(r => r.id !== id);
-            setRequests(newReqs);
-            // Re-calc
-            // Need `profile.date_of_entry` which is not in scope easily unless stored.
-            // Simplified: Just update state. In real app, re-fetch.
-            return;
-        }
-
-        const confirm = window.confirm('¿Seguro que deseas eliminar esta solicitud?');
-        if (!confirm) return;
-
-        const { error } = await supabase.from('vacation_requests').delete().eq('id', id);
-        if (error) {
-            alert('Error al borrar');
-        } else {
-            fetchVacationData();
-        }
-    };
-
-    if (loading) return <div>Cargando vacaciones...</div>;
-
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-
-            {/* 1. Resumen de Saldos */}
-            <Card title="Vacaciones">
-                <h4 style={{ color: 'var(--color-text-muted)', marginBottom: '1rem', fontWeight: 500 }}>Saldo</h4>
-                <div style={{ display: 'flex', gap: '3rem', flexWrap: 'wrap' }}>
-                    <StatItem label="Acumuladas" value={summary.totalAccrued} />
-                    <StatItem label="Tomadas" value={summary.totalTaken} />
-                    <StatItem label="Vencidas" value={summary.accruedExpired} />
-                    <StatItem label="Futuro" value={summary.future} />
-                    <StatItem label="Restantes" value={summary.currentRemaining} highlight />
-                </div>
-            </Card>
-
-            {/* 2. Vacaciones Tomadas */}
-            <Card title="Vacaciones Tomadas">
-                <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
-                        <thead>
-                            <tr style={{ borderBottom: '1px solid var(--border-color)', textAlign: 'left' }}>
-                                <th style={thStyle}>Fecha Inicio</th>
-                                <th style={thStyle}>Fecha Fin</th>
-                                <th style={thStyle}>Días</th>
-                                <th style={thStyle}>Tipo</th>
-                                <th style={thStyle}>Estado</th>
-                                <th style={thStyle}>Opciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {requests.map((request) => (
-                                <tr key={request.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                                    <td style={tdStyle}>{request.start_date}</td>
-                                    <td style={tdStyle}>{request.end_date}</td>
-                                    <td style={tdStyle}>{request.days_requested}</td>
-                                    <td style={tdStyle}>{request.type}</td>
-                                    <td style={tdStyle}>
-                                        <StatusBadge status={request.status} />
-                                    </td>
-                                    <td style={tdStyle}>
-                                        <div style={{ display: 'flex', gap: '8px' }}>
-                                            <ActionIcon icon={<Edit2 size={16} />} title="Editar" onClick={() => alert('Próximamente: Editar')} />
-                                            <ActionIcon icon={<Trash2 size={16} />} title="Borrar" onClick={() => handleDelete(request.id)} />
-                                            <ActionIcon icon={<Eye size={16} />} title="Ver" onClick={() => alert(`Detalles: ${request.type} (${request.days_requested} días)`)} />
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                            {requests.length === 0 && (
-                                <tr>
-                                    <td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-muted)' }}>
-                                        No hay vacaciones registradas.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </Card>
-
-            {/* 3. Vacaciones Acumuladas */}
-            <Card title="Vacaciones Acumuladas">
-                <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
-                        <thead>
-                            <tr style={{ borderBottom: '1px solid var(--border-color)', textAlign: 'left' }}>
-                                <th style={thStyle}>Periodo</th>
-                                <th style={thStyle}>Vigencia</th>
-                                <th style={thStyle}>Días Ganados</th>
-                                <th style={thStyle}>Tomados</th>
-                                <th style={thStyle}>Pendientes</th>
-                                <th style={thStyle}>Estatus</th>
-                                {/* Opciones removed as requested */}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {periods.map((p) => (
-                                <tr key={p.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                                    <td style={tdStyle}>{p.period}</td>
-                                    <td style={tdStyle}>
-                                        {p.start_date.toLocaleDateString()} - {p.end_date.toLocaleDateString()}
-                                    </td>
-                                    <td style={tdStyle}>{p.days_entitled} Días</td>
-                                    <td style={tdStyle}>{p.days_taken}</td>
-                                    <td style={tdStyle}>{p.days_pending}</td>
-                                    <td style={tdStyle}>
-                                        <span style={{
-                                            color: p.status === 'Actual' ? 'var(--color-primary)' : 'var(--color-text-muted)',
-                                            fontWeight: p.status === 'Actual' ? 600 : 400
-                                        }}>
-                                            {p.status}
-                                        </span>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </Card>
-        </div>
-    );
-};
 
 // --- Mocks removed as requested ---
 

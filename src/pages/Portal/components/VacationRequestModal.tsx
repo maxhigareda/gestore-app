@@ -5,12 +5,25 @@ interface VacationRequestModalProps {
     balance: number;
     onClose: () => void;
     onSuccess: () => void;
+    mode?: 'create' | 'edit' | 'view';
+    initialData?: {
+        id: string;
+        startDate: string;
+        endDate: string;
+        comment?: string;
+    };
 }
 
-const VacationRequestModal: React.FC<VacationRequestModalProps> = ({ balance, onClose, onSuccess }) => {
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
-    const [comment, setComment] = useState('');
+const VacationRequestModal: React.FC<VacationRequestModalProps> = ({
+    balance,
+    onClose,
+    onSuccess,
+    mode = 'create',
+    initialData
+}) => {
+    const [startDate, setStartDate] = useState(initialData?.startDate || '');
+    const [endDate, setEndDate] = useState(initialData?.endDate || '');
+    const [comment, setComment] = useState(initialData?.comment || '');
     const [daysRequested, setDaysRequested] = useState(0);
 
     // Calculate days difference
@@ -26,35 +39,60 @@ const VacationRequestModal: React.FC<VacationRequestModalProps> = ({ balance, on
         }
     }, [startDate, endDate]);
 
-    const isValid = daysRequested > 0 && daysRequested <= balance;
-    const isOverBalance = daysRequested > balance;
+    // Validation
+    // In edit mode, we might be adding days or keeping same. 
+    // Ideally we should calculate balance diff, but for now strict check against CURRENT balance + OLD request days (if we had that info).
+    // Simplification: Check against updated balance passed in props? 
+    // Actually, the 'balance' prop passed from Parent is 'Current Available'.
+    // If I Edit a request of 5 days, those 5 days are ALREADY deducted from 'Current Remaining' (balance)? 
+    // NO. 'Current Remaining' = Entitled - Taken - Pending.
+    // So if I edit a Pending request, it is ALREADY counted in Pending.
+    // If I change 5 days to 7 days, I need 2 more days.
+    // This logic is complex. 
+    // User requirement: "Editar sale el mismo modal... modificar".
+    // Let's assume the user has enough balance if they are just changing dates slightly. 
+    // Proper valid: (Balance + initialDays) >= newDays.
+
+    // We don't have initialDays stored easily unless we recalc from initialData.
+    const initialDays = initialData ? (Math.ceil(Math.abs(new Date(initialData.endDate).getTime() - new Date(initialData.startDate).getTime()) / (86400000)) + 1) : 0;
+    const effectiveBalance = mode === 'edit' ? (balance + initialDays) : balance;
+
+    const isValid = daysRequested > 0 && daysRequested <= effectiveBalance;
+    const isOverBalance = daysRequested > effectiveBalance;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!isValid) return;
 
         try {
-            // 1. Get User
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error('No user logged in');
 
-            // 2. Insert Request
-            // Note: 'reason' (comment) removed because column likely doesn't exist in DB yet.
-            const { error } = await supabase.from('vacation_requests').insert({
-                user_id: user.id,
-                start_date: startDate,
-                end_date: endDate,
-                days_requested: daysRequested,
-                status: 'Solicitada',
-                type: 'Vacaciones'
-            });
-
-            if (error) throw error;
+            if (mode === 'create') {
+                const { error } = await supabase.from('vacation_requests').insert({
+                    user_id: user.id,
+                    start_date: startDate,
+                    end_date: endDate,
+                    days_requested: daysRequested,
+                    status: 'Solicitada',
+                    type: 'Vacaciones'
+                    // reason: comment // Removed per previous fix
+                });
+                if (error) throw error;
+            } else if (mode === 'edit' && initialData?.id) {
+                const { error } = await supabase.from('vacation_requests').update({
+                    start_date: startDate,
+                    end_date: endDate,
+                    days_requested: daysRequested,
+                    // reason: comment 
+                }).eq('id', initialData.id);
+                if (error) throw error;
+            }
 
             onSuccess();
         } catch (err: any) {
             console.error('Error submitting vacation request:', err);
-            alert(`Error al solicitar vacaciones: ${err.message || 'Intenta de nuevo'}`);
+            alert(`Error: ${err.message || 'Intenta de nuevo'}`);
         }
     };
 
@@ -63,8 +101,12 @@ const VacationRequestModal: React.FC<VacationRequestModalProps> = ({ balance, on
 
             {/* Header Info */}
             <div style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
-                <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Días disponibles</p>
-                <h2 style={{ fontSize: '2rem', color: 'var(--color-primary)' }}>{balance}</h2>
+                <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
+                    {mode === 'view' ? 'Días solicitados' : 'Días disponibles'}
+                </p>
+                <h2 style={{ fontSize: '2rem', color: 'var(--color-primary)' }}>
+                    {mode === 'view' ? daysRequested : effectiveBalance}
+                </h2>
             </div>
 
             {/* Date Inputs */}
@@ -74,9 +116,10 @@ const VacationRequestModal: React.FC<VacationRequestModalProps> = ({ balance, on
                     <input
                         type="date"
                         required
+                        disabled={mode === 'view'}
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
-                        style={inputStyle}
+                        style={{ ...inputStyle, opacity: mode === 'view' ? 0.7 : 1 }}
                     />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -84,15 +127,16 @@ const VacationRequestModal: React.FC<VacationRequestModalProps> = ({ balance, on
                     <input
                         type="date"
                         required
+                        disabled={mode === 'view'}
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
-                        style={inputStyle}
+                        style={{ ...inputStyle, opacity: mode === 'view' ? 0.7 : 1 }}
                     />
                 </div>
             </div>
 
             {/* Validation Message */}
-            {startDate && endDate && (
+            {mode !== 'view' && startDate && endDate && (
                 <div style={{
                     padding: '10px',
                     backgroundColor: isOverBalance ? 'rgba(255, 77, 79, 0.1)' : 'rgba(59, 130, 246, 0.1)',
@@ -113,10 +157,11 @@ const VacationRequestModal: React.FC<VacationRequestModalProps> = ({ balance, on
                 <label style={labelStyle}>Comentarios</label>
                 <textarea
                     rows={3}
+                    disabled={mode === 'view'}
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    style={{ ...inputStyle, resize: 'none' }}
-                    placeholder="Escribe un comentario opcional..."
+                    style={{ ...inputStyle, resize: 'none', opacity: mode === 'view' ? 0.7 : 1 }}
+                    placeholder={mode === 'view' ? "Sin comentarios" : "Escribe un comentario opcional..."}
                 />
             </div>
 
@@ -127,21 +172,23 @@ const VacationRequestModal: React.FC<VacationRequestModalProps> = ({ balance, on
                     onClick={onClose}
                     style={secondaryButtonStyle}
                 >
-                    Cancelar
+                    {mode === 'view' ? 'Cerrar' : 'Cancelar'}
                 </button>
-                <button
-                    type="submit"
-                    disabled={!isValid}
-                    style={{
-                        ...primaryButtonStyle,
-                        opacity: isValid ? 1 : 0.5,
-                        cursor: isValid ? 'pointer' : 'not-allowed'
-                    }}
-                >
-                    Solicitar
-                </button>
-            </div>
 
+                {mode !== 'view' && (
+                    <button
+                        type="submit"
+                        disabled={!isValid}
+                        style={{
+                            ...primaryButtonStyle,
+                            opacity: isValid ? 1 : 0.5,
+                            cursor: isValid ? 'pointer' : 'not-allowed'
+                        }}
+                    >
+                        {mode === 'edit' ? 'Guardar Cambios' : 'Solicitar'}
+                    </button>
+                )}
+            </div>
         </form>
     );
 };
