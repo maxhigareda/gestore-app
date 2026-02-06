@@ -17,7 +17,6 @@ interface OrgProfile {
 const OrgNode: React.FC<{
     profile: OrgProfile;
     isRoot?: boolean;
-    isRoot?: boolean;
     parentNode?: OrgProfile
 }> = ({ profile, isRoot, parentNode: _parentNode }) => {
     const [subordinates, setSubordinates] = useState<OrgProfile[]>([]);

@@ -41,12 +41,25 @@ const SecondarySidebar: React.FC = () => {
                     {user?.photoUrl ? <img src={user.photoUrl} alt="User" style={{ borderRadius: '50%', width: '100%', height: '100%' }} /> : 'Foto'}
                 </div>
                 <h3 style={{ fontSize: '1.2rem', marginBottom: '0.1rem', fontWeight: 600 }}>
-                    Hola {user?.firstName}
+                    ¡Hola!
                 </h3>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.25rem', fontWeight: 400 }}>
+                <h3 style={{ fontSize: '1.1rem', marginBottom: '0.1rem', fontWeight: 500 }}>
+                    {user?.firstName}
+                </h3>
+                <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', fontWeight: 400 }}>
                     {user?.lastName}
                 </h3>
-                <p style={{ fontSize: '0.85rem', color: 'var(--color-primary)' }}>{user?.role}</p>
+                <span style={{
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    color: '#60a5fa',
+                    padding: '4px 12px',
+                    borderRadius: '12px',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    display: 'inline-block'
+                }}>
+                    {user?.role}
+                </span>
             </div>
 
             <nav style={{ display: 'flex', flexDirection: 'column', padding: '0 1rem' }}>
