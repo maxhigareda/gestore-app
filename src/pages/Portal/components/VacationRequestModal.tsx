@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { supabase } from '../../../lib/supabaseClient';
 
 interface VacationRequestModalProps {
     balance: number;
@@ -28,10 +29,33 @@ const VacationRequestModal: React.FC<VacationRequestModalProps> = ({ balance, on
     const isValid = daysRequested > 0 && daysRequested <= balance;
     const isOverBalance = daysRequested > balance;
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!isValid) return;
-        onSuccess();
+
+        try {
+            // 1. Get User
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('No user logged in');
+
+            // 2. Insert Request
+            const { error } = await supabase.from('vacation_requests').insert({
+                user_id: user.id,
+                start_date: startDate,
+                end_date: endDate,
+                days_requested: daysRequested,
+                reason: comment,
+                status: 'Solicitada',
+                type: 'Vacaciones'
+            });
+
+            if (error) throw error;
+
+            onSuccess();
+        } catch (err) {
+            console.error('Error submitting vacation request:', err);
+            alert('Error al solicitar vacaciones. Intenta de nuevo.');
+        }
     };
 
     return (

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { supabase } from '../../../lib/supabaseClient';
 
 interface PermissionRequestModalProps {
     onClose: () => void;
@@ -34,10 +35,30 @@ const PermissionRequestModal: React.FC<PermissionRequestModalProps> = ({ onClose
         }
     }, [startDate, endDate]);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (daysRequested <= 0) return;
-        onSuccess();
+
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('No user logged in');
+
+            const { error } = await supabase.from('permission_requests').insert({
+                user_id: user.id,
+                start_date: startDate,
+                end_date: endDate,
+                days_requested: daysRequested,
+                reason: comment,
+                status: 'Solicitada',
+                type: type
+            });
+
+            if (error) throw error;
+            onSuccess();
+        } catch (err) {
+            console.error('Error submitting permission request:', err);
+            alert('Error al solicitar permiso. Intenta de nuevo.');
+        }
     };
 
     return (
