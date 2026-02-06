@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+// Portal Page Logic - Updated for Real Metrics
 import { Palmtree, UserCheck, CalendarCheck } from 'lucide-react';
 import QuickActionCard from './components/QuickActionCard';
 import VacationRequestModal from './components/VacationRequestModal';
