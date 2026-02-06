@@ -215,15 +215,7 @@ const VacacionesTab: React.FC = () => {
     );
 };
 
-// --- Mocks for Default Display ---
-const MOCK_DISPLAY_REQUESTS: VacationRequest[] = [
-    {
-        id: 'mock-1', start_date: '2023-12-20', end_date: '2023-12-24', days_requested: 5, status: 'Aprobada', type: 'Vacaciones'
-    },
-    {
-        id: 'mock-2', start_date: '2024-04-01', end_date: '2024-04-03', days_requested: 3, status: 'Solicitada', type: 'Vacaciones'
-    }
-];
+// --- Mocks removed as requested ---
 
 // --- Subcomponents ---
 

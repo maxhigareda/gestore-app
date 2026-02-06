@@ -124,7 +124,17 @@ const PortalPage: React.FC = () => {
                                 </span>
                             )}
                         </span>
-                    )} // ...
+                    )}
+                    buttonLabel="Solicitar"
+                    onButtonClick={() => setActiveModal('vacation')}
+                    color="#575fa0" // Muted Indigo/Blue
+                />
+
+                {/* Permission Card */}
+                <QuickActionCard
+                    title="Solicitar Permiso"
+                    icon={<UserCheck size={24} />}
+                    metricLabel="Días pedidos este año"
                     metricValue={loading ? "..." : (
                         <span>
                             {permissionDays} días
