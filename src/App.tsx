@@ -14,18 +14,18 @@ import OrganigramaPage from './pages/Directory/Organigrama';
 
                 <Route path="recognition" element={<PlaceholderPage title="Reconocimientos" />} />
                 <Route path="org-chart" element={<OrganigramaPage />} />
-                <Route path="directory" element={<DirectoryPage />} />
-const { isAuthenticated, isLoading } = useAuth();
+const ProtectedRoute = () => {
+  const { isAuthenticated, isLoading } = useAuth();
 
-if (isLoading) {
-  return (
-    <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      Cargando...
-    </div>
-  );
-}
+  if (isLoading) {
+    return (
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        Cargando...
+      </div>
+    );
+  }
 
-return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
+  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
 import ErrorBoundary from './components/ErrorBoundary';

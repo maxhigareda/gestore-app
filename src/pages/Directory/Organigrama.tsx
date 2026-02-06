@@ -167,7 +167,7 @@ const OrgNode: React.FC<{
 
                         {/* Children Container */}
                         <div style={{ display: 'flex', gap: '2rem', paddingTop: '0px' }}>
-                            {subordinates.map((sub, index) => (
+                            {subordinates.map((sub) => (
                                 <div key={sub.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                     {/* Small top connecter for child to the horizontal bar above */}
                                     {/* To make it look like a tree, we need the horizontal bar to just span from first to last child center. 
