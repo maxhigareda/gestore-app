@@ -12,6 +12,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.94.1",
     "@types/papaparse": "^5.5.2",
+    "framer-motion": "^12.33.0",
     "lucide-react": "^0.563.0",
     "papaparse": "^5.5.3",
     "react": "^19.2.0",

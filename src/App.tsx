@@ -8,19 +8,24 @@ import EvaluationsPage from './pages/Evaluations';
 import PortalPage from './pages/Portal';
 import TrainingPage from './pages/Training';
 import DirectoryPage from './pages/Directory';
+import OrganigramaPage from './pages/Directory/Organigrama';
 
-const ProtectedRoute = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+// ...
 
-  if (isLoading) {
-    return (
-      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        Cargando...
-      </div>
-    );
-  }
+                <Route path="recognition" element={<PlaceholderPage title="Reconocimientos" />} />
+                <Route path="org-chart" element={<OrganigramaPage />} />
+                <Route path="directory" element={<DirectoryPage />} />
+const { isAuthenticated, isLoading } = useAuth();
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
+if (isLoading) {
+  return (
+    <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      Cargando...
+    </div>
+  );
+}
+
+return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
 import ErrorBoundary from './components/ErrorBoundary';
