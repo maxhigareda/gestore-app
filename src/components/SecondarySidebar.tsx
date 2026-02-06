@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, FileText, Users, ClipboardList, BookOpen, Award, Network, Contact } from 'lucide-react';
+import { LayoutDashboard, FileText, BookOpen, Network, Contact } from 'lucide-react';
 
 const SecondarySidebar: React.FC = () => {
     const { user } = useAuth();

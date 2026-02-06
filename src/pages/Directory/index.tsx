@@ -43,7 +43,7 @@ const DirectoryPage: React.FC = () => {
     const filteredProfiles = profiles.filter(profile =>
         profile.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         profile.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        profile.role?.toLowerCase().includes(searchTerm.toLowerCase())
+        profile.job_title?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (

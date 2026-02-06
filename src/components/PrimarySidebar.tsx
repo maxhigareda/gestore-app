@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Briefcase, TrendingUp, GraduationCap } from 'lucide-react';
+import { Home, Briefcase, GraduationCap } from 'lucide-react';
 import '../styles/theme.css';
 
 const PrimarySidebar: React.FC = () => {
