@@ -1,30 +1,86 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Palmtree, UserCheck, CalendarCheck } from 'lucide-react';
 import QuickActionCard from './components/QuickActionCard';
 import VacationRequestModal from './components/VacationRequestModal';
 import PermissionRequestModal from './components/PermissionRequestModal';
 import Modal from '../../components/Modal';
-import { MOCK_USER_PROFILE } from '../../utils/mockData';
+import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../lib/supabaseClient';
+import { calculateVacationPeriods, getVacationSummary, VacationRequest } from '../../utils/vacationLogic';
 
 const PortalPage: React.FC = () => {
-    // State for Modals
+    const { user } = useAuth();
+
+    // Metrics State
+    const [vacationBalance, setVacationBalance] = useState<number>(0);
+    const [permissionDays, setPermissionDays] = useState<number>(0);
+    const [loading, setLoading] = useState<boolean>(true);
+
+    // Modal State
     const [activeModal, setActiveModal] = useState<'vacation' | 'permission' | 'success' | null>(null);
     const [successMessage, setSuccessMessage] = useState('');
+
+    useEffect(() => {
+        if (user) {
+            fetchMetrics();
+        }
+    }, [user]);
+
+    const fetchMetrics = async () => {
+        try {
+            if (!user?.id) return;
+
+            // 1. Fetch Profile (for company_entry_date) & Vacation Requests
+            const [profileRes, vacReqsRes] = await Promise.all([
+                supabase.from('profiles').select('company_entry_date').eq('id', user.id).single(),
+                supabase.from('vacation_requests').select('*').eq('user_id', user.id)
+            ]);
+
+            // Calculate Vacation Balance
+            if (profileRes.data?.company_entry_date) {
+                const periods = calculateVacationPeriods(
+                    profileRes.data.company_entry_date,
+                    (vacReqsRes.data as VacationRequest[]) || []
+                );
+                const summary = getVacationSummary(periods);
+                setVacationBalance(summary.currentRemaining);
+            }
+
+            // 2. Fetch Permission Requests (Current Year)
+            const currentYear = new Date().getFullYear();
+            const { data: permReqs } = await supabase
+                .from('permission_requests')
+                .select('days_requested')
+                .eq('user_id', user.id)
+                .gte('start_date', `${currentYear}-01-01`)
+                .lte('start_date', `${currentYear}-12-31`);
+
+            const totalPermissions = permReqs?.reduce((sum, r: any) => sum + r.days_requested, 0) || 0;
+            setPermissionDays(totalPermissions);
+
+        } catch (error) {
+            console.error("Error fetching portal metrics:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleVacationRequestSuccess = () => {
         setActiveModal('success');
         setSuccessMessage('Se ha enviado tu solicitud de vacaciones, espera la confirmación.');
+        fetchMetrics(); // Refresh data
     };
 
     const handlePermissionRequestSuccess = () => {
         setActiveModal('success');
         setSuccessMessage('Se ha enviado tu permiso, en espera de ser autorizado.');
+        fetchMetrics(); // Refresh data
     };
 
     return (
         <div style={{
             display: 'grid',
-            gridTemplateColumns: '350px 1fr',
+            gridTemplateColumns: 'minmax(300px, 350px) 1fr',
             gap: '2rem',
             height: '100%'
         }}>
@@ -37,7 +93,7 @@ const PortalPage: React.FC = () => {
                     title="Solicitar Vacaciones"
                     icon={<Palmtree size={24} />}
                     metricLabel="Días restantes"
-                    metricValue={`${MOCK_USER_PROFILE.vacationBalance} días`}
+                    metricValue={loading ? "..." : `${vacationBalance} días`}
                     buttonLabel="Solicitar"
                     onButtonClick={() => setActiveModal('vacation')}
                     color="#575fa0" // Muted Indigo/Blue
@@ -48,7 +104,7 @@ const PortalPage: React.FC = () => {
                     title="Solicitar Permiso"
                     icon={<UserCheck size={24} />}
                     metricLabel="Días pedidos este año"
-                    metricValue="2 días"
+                    metricValue={loading ? "..." : `${permissionDays} días`}
                     buttonLabel="Solicitar"
                     onButtonClick={() => setActiveModal('permission')}
                     color="#6c757d" // Neutral Grey
@@ -81,7 +137,7 @@ const PortalPage: React.FC = () => {
                 title="Solicitar Vacaciones"
             >
                 <VacationRequestModal
-                    balance={MOCK_USER_PROFILE.vacationBalance}
+                    balance={vacationBalance}
                     onClose={() => setActiveModal(null)}
                     onSuccess={handleVacationRequestSuccess}
                 />
