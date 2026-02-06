@@ -4,7 +4,7 @@ interface QuickActionCardProps {
     title: string;
     icon: React.ReactNode;
     metricLabel: string;
-    metricValue: string | number;
+    metricValue: React.ReactNode;
     buttonLabel: string;
     onButtonClick: () => void;
     color?: string; // Accent color

@@ -71,10 +71,10 @@ const VacationRequestModal: React.FC<VacationRequestModalProps> = ({ balance, on
             {startDate && endDate && (
                 <div style={{
                     padding: '10px',
-                    backgroundColor: isOverBalance ? 'rgba(255, 77, 79, 0.1)' : 'rgba(0, 202, 114, 0.1)',
+                    backgroundColor: isOverBalance ? 'rgba(255, 77, 79, 0.1)' : 'rgba(59, 130, 246, 0.1)',
                     borderRadius: '6px',
                     textAlign: 'center',
-                    color: isOverBalance ? 'var(--color-danger)' : 'var(--color-success)',
+                    color: isOverBalance ? 'var(--color-danger)' : '#60a5fa',
                     fontWeight: 500
                 }}>
                     {isOverBalance
