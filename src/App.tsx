@@ -1,5 +1,9 @@
+import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import ErrorBoundary from './components/ErrorBoundary';
+
+// Pages
 import Login from './pages/Login';
 import MainLayout from './layouts/MainLayout';
 import PlaceholderPage from './components/PlaceholderPage';
@@ -10,10 +14,7 @@ import TrainingPage from './pages/Training';
 import DirectoryPage from './pages/Directory';
 import OrganigramaPage from './pages/Directory/Organigrama';
 
-// ...
-
-                <Route path="recognition" element={<PlaceholderPage title="Reconocimientos" />} />
-                <Route path="org-chart" element={<OrganigramaPage />} />
+// Protected Route Component
 const ProtectedRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
 
@@ -28,8 +29,6 @@ const ProtectedRoute = () => {
   return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
-import ErrorBoundary from './components/ErrorBoundary';
-
 function App() {
   return (
     <ErrorBoundary>
@@ -40,19 +39,23 @@ function App() {
 
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<MainLayout />}>
-                {/* Default redirect to Portal or Dashboard */}
+                {/* Default redirect to Portal */}
                 <Route index element={<Navigate to="/portal" replace />} />
 
                 {/* Home Module Routes */}
                 <Route path="portal" element={<PortalPage />} />
                 <Route path="ficha" element={<FichaPage />} />
+
+                {/* Team & Directory */}
                 <Route path="team" element={<PlaceholderPage title="Mi Equipo" />} />
+                <Route path="directory" element={<DirectoryPage />} />
+                <Route path="org-chart" element={<OrganigramaPage />} />
+
+                {/* Growth & Feedback */}
+                <Route path="evaluations" element={<EvaluationsPage />} />
                 <Route path="surveys" element={<PlaceholderPage title="Mis Encuestas" />} />
                 <Route path="training-my" element={<TrainingPage />} />
-                <Route path="evaluations" element={<EvaluationsPage />} />
                 <Route path="recognition" element={<PlaceholderPage title="Reconocimientos" />} />
-                <Route path="org-chart" element={<PlaceholderPage title="Organigrama" />} />
-                <Route path="directory" element={<DirectoryPage />} />
 
                 {/* Other Module Placeholders */}
                 <Route path="admin/*" element={<PlaceholderPage title="Módulo Administrativo" />} />
