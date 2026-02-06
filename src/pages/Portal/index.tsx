@@ -116,9 +116,9 @@ const PortalPage: React.FC = () => {
                     metricLabel="Días restantes"
                     metricValue={loading ? "..." : (
                         <span>
-                            {vacationBalance} días
+                            {vacationBalance + vacationPending} días
                             {vacationPending > 0 && (
-                                <span style={{ fontSize: '0.85rem', fontWeight: 400, marginLeft: '8px', color: '#666' }}>
+                                <span style={{ fontSize: '0.9rem', fontWeight: 400, marginLeft: '8px', color: '#555' }}>
                                     ({vacationPending} solicitados)
                                 </span>
                             )}
