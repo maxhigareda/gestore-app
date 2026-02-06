@@ -39,12 +39,12 @@ const VacationRequestModal: React.FC<VacationRequestModalProps> = ({ balance, on
             if (!user) throw new Error('No user logged in');
 
             // 2. Insert Request
+            // Note: 'reason' (comment) removed because column likely doesn't exist in DB yet.
             const { error } = await supabase.from('vacation_requests').insert({
                 user_id: user.id,
                 start_date: startDate,
                 end_date: endDate,
                 days_requested: daysRequested,
-                reason: comment,
                 status: 'Solicitada',
                 type: 'Vacaciones'
             });
@@ -52,9 +52,9 @@ const VacationRequestModal: React.FC<VacationRequestModalProps> = ({ balance, on
             if (error) throw error;
 
             onSuccess();
-        } catch (err) {
+        } catch (err: any) {
             console.error('Error submitting vacation request:', err);
-            alert('Error al solicitar vacaciones. Intenta de nuevo.');
+            alert(`Error al solicitar vacaciones: ${err.message || 'Intenta de nuevo'}`);
         }
     };
 

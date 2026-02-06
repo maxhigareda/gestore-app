@@ -43,21 +43,21 @@ const PermissionRequestModal: React.FC<PermissionRequestModalProps> = ({ onClose
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error('No user logged in');
 
+            // Note: 'type' removed because column likely doesn't exist in DB yet.
             const { error } = await supabase.from('permission_requests').insert({
                 user_id: user.id,
                 start_date: startDate,
                 end_date: endDate,
                 days_requested: daysRequested,
                 reason: comment,
-                status: 'Solicitada',
-                type: type
+                status: 'Solicitada'
             });
 
             if (error) throw error;
             onSuccess();
-        } catch (err) {
+        } catch (err: any) {
             console.error('Error submitting permission request:', err);
-            alert('Error al solicitar permiso. Intenta de nuevo.');
+            alert(`Error al solicitar permiso: ${err.message || 'Intenta de nuevo'}`);
         }
     };
 
