@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 // Portal Page Logic - Updated for Real Metrics & Visibility
+// Metrics display shows Gross Balance (Available + Pending) as requested
 import { Palmtree, UserCheck, CalendarCheck } from 'lucide-react';
 import QuickActionCard from './components/QuickActionCard';
 import VacationRequestModal from './components/VacationRequestModal';
