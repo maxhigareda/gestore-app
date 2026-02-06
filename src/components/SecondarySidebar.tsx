@@ -47,11 +47,11 @@ const SecondarySidebar: React.FC = () => {
             <nav style={{ display: 'flex', flexDirection: 'column', padding: '0 1rem' }}>
                 <SidebarLink to="/portal" icon={<LayoutDashboard size={18} />} label="Portal" />
                 <SidebarLink to="/ficha" icon={<FileText size={18} />} label="Ficha" />
-                <SidebarLink to="/team" icon={<Users size={18} />} label="Mi equipo" />
-                <SidebarLink to="/surveys" icon={<ClipboardList size={18} />} label="Mis Encuestas" />
+                {/* <SidebarLink to="/team" icon={<Users size={18} />} label="Mi equipo" /> */}
+                {/* <SidebarLink to="/surveys" icon={<ClipboardList size={18} />} label="Mis Encuestas" /> */}
                 <SidebarLink to="/training-my" icon={<BookOpen size={18} />} label="Mis Capacitaciones" />
                 <SidebarLink to="/evaluations" icon={<FileText size={18} />} label="Mis Evaluaciones" />
-                <SidebarLink to="/recognition" icon={<Award size={18} />} label="Reconocimientos" />
+                {/* <SidebarLink to="/recognition" icon={<Award size={18} />} label="Reconocimientos" /> */}
                 <SidebarLink to="/org-chart" icon={<Network size={18} />} label="Organigrama" />
                 <SidebarLink to="/directory" icon={<Contact size={18} />} label="Directorio" />
             </nav>

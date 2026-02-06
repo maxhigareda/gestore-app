@@ -5,11 +5,14 @@ import { Search } from 'lucide-react';
 interface Profile {
     id: string;
     email: string;
-    full_name: string;
-    avatar_url: string;
-    role: string;
+    first_name: string;
+    last_name: string;
+    full_name?: string; // Optional if we construct it
+    photo_url: string;
+    job_title: string;
     department: string;
-    created_at: string;
+    supervisor: string;
+    company_entry_date: string;
 }
 
 const DirectoryPage: React.FC = () => {
@@ -87,13 +90,13 @@ const DirectoryPage: React.FC = () => {
                 flex: 1,
                 overflowY: 'auto'
             }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
                     <thead style={{ backgroundColor: 'var(--color-secondary-background)', position: 'sticky', top: 0 }}>
                         <tr style={{ textAlign: 'left', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
                             <th style={{ padding: '1rem', fontWeight: 600 }}>Colaborador</th>
-                            <th style={{ padding: '1rem', fontWeight: 600 }}>Correo</th>
-                            <th style={{ padding: '1rem', fontWeight: 600 }}>Puesto</th>
-                            <th style={{ padding: '1rem', fontWeight: 600 }}>Departamento</th>
+                            <th style={{ padding: '1rem', fontWeight: 600 }}>Rol</th>
+                            <th style={{ padding: '1rem', fontWeight: 600 }}>Área</th>
+                            <th style={{ padding: '1rem', fontWeight: 600 }}>Supervisor</th>
                             <th style={{ padding: '1rem', fontWeight: 600 }}>Fecha Ingreso</th>
                         </tr>
                     </thead>
@@ -115,13 +118,15 @@ const DirectoryPage: React.FC = () => {
                                 <tr key={profile.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                                     <td style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
                                         <img
-                                            src={profile.avatar_url || 'https://via.placeholder.com/40'}
+                                            src={profile.photo_url || 'https://via.placeholder.com/40'}
                                             alt={profile.full_name}
                                             style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
                                         />
-                                        <span style={{ fontWeight: 500 }}>{profile.full_name || 'Sin nombre'}</span>
+                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            <span style={{ fontWeight: 500 }}>{profile.first_name} {profile.last_name}</span>
+                                            <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>{profile.email}</span>
+                                        </div>
                                     </td>
-                                    <td style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>{profile.email}</td>
                                     <td style={{ padding: '1rem' }}>
                                         <span style={{
                                             backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -131,12 +136,13 @@ const DirectoryPage: React.FC = () => {
                                             fontSize: '0.8rem',
                                             fontWeight: 500
                                         }}>
-                                            {profile.role}
+                                            {profile.job_title || 'N/A'}
                                         </span>
                                     </td>
-                                    <td style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>{profile.department}</td>
+                                    <td style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>{profile.department || 'N/A'}</td>
+                                    <td style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>{profile.supervisor || 'N/A'}</td>
                                     <td style={{ padding: '1rem', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
-                                        {new Date(profile.created_at).toLocaleDateString()}
+                                        {profile.company_entry_date ? new Date(profile.company_entry_date).toLocaleDateString() : 'N/A'}
                                     </td>
                                 </tr>
                             ))

@@ -70,18 +70,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const mapUser = (supabaseUser: any) => {
         // Map Supabase user metadata to our App's User interface
-        const newUser: User = {
-            id: supabaseUser.id,
-            name: supabaseUser.user_metadata.full_name || supabaseUser.email?.split('@')[0] || 'Usuario',
-            email: supabaseUser.email || '',
-            role: 'Colaborador', // Default role for now
-            photoUrl: supabaseUser.user_metadata.avatar_url || '',
-            department: 'General',
-            location: 'Oficina Central',
-            joinDate: new Date(supabaseUser.created_at).toLocaleDateString()
-        };
-        setUser(newUser);
-        setIsLoading(false);
+        // We need to fetch additional profile data if not present in metadata
+        // For now, let's assume we might need to fetch profile separate or rely on metadata if synced.
+        // But since we are using 'profiles' table, we should ideally fetch from there or rely on what we have.
+        // If we can't fetch strictly here without async, we might default.
+        // However, 'user_metadata' might not have job_title unless we sync it.
+
+        // BETTER APPROACH: We already fetch profile in FichaPage. 
+        // But the Sidebar needs it globally. 
+        // Let's try to fetch the profile here quickly or fallback.
+
+        // Actually, let's just use a default for now and rely on the Portal/Sidebar to fetch if needed?
+        // No, user wants it "where it says hola max". That's SecondarySidebar.
+        // SecondarySidebar uses `user.role`.
+
+        // Let's just update this mapUser to try to get it from metadata if available, 
+        // OR we should perform a DB fetch here.
+
+        // Fetching profile...
+        supabase
+            .from('profiles')
+            .select('job_title')
+            .eq('id', supabaseUser.id)
+            .single()
+            .then(({ data }) => {
+                const newUser: User = {
+                    id: supabaseUser.id,
+                    name: supabaseUser.user_metadata.full_name || supabaseUser.email?.split('@')[0] || 'Usuario',
+                    email: supabaseUser.email || '',
+                    role: data?.job_title || 'Colaborador', // Use DB job_title
+                    photoUrl: supabaseUser.user_metadata.avatar_url || '',
+                    department: 'General',
+                    location: 'Oficina Central',
+                    joinDate: new Date(supabaseUser.created_at).toLocaleDateString()
+                };
+                setUser(newUser);
+                setIsLoading(false);
+            });
     };
 
     const login = async () => {

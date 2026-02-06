@@ -9,8 +9,8 @@ const PrimarySidebar: React.FC = () => {
     const navItems = [
         { to: '/', icon: <Home size={iconSize} />, label: 'Home' },
         { to: '/admin', icon: <Briefcase size={iconSize} />, label: 'Administrativo' },
-        { to: '/org-dev', icon: <TrendingUp size={iconSize} />, label: 'Desarrollo' },
-        { to: '/training', icon: <GraduationCap size={iconSize} />, label: 'Capacitaciones' },
+        // { to: '/org-dev', icon: <TrendingUp size={iconSize} />, label: 'Desarrollo' }, // Hidden
+        { to: '/training-my', icon: <GraduationCap size={iconSize} />, label: 'Capacitaciones' }, // Redirect to My Training
     ];
 
     return (
