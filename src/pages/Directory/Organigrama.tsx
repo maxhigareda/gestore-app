@@ -17,11 +17,12 @@ interface OrgProfile {
 const OrgNode: React.FC<{
     profile: OrgProfile;
     isRoot?: boolean;
+    isRoot?: boolean;
     parentNode?: OrgProfile
-}> = ({ profile, isRoot, parentNode }) => {
+}> = ({ profile, isRoot, parentNode: _parentNode }) => {
     const [subordinates, setSubordinates] = useState<OrgProfile[]>([]);
     const [isExpanded, setIsExpanded] = useState(false);
-    const [loading, setLoading] = useState(false);
+    // const [loading, setLoading] = useState(false); // Unused for now
     const [subCount, setSubCount] = useState(0);
 
     useEffect(() => {
@@ -46,7 +47,7 @@ const OrgNode: React.FC<{
             return;
         }
 
-        setLoading(true);
+        // setLoading(true);
         const { data, error } = await supabase
             .from('profiles')
             .select('*')
@@ -56,7 +57,7 @@ const OrgNode: React.FC<{
             setSubordinates(data as OrgProfile[]);
             setIsExpanded(true);
         }
-        setLoading(false);
+        // setLoading(false);
     };
 
     return (

@@ -40,7 +40,12 @@ const SecondarySidebar: React.FC = () => {
                 }}>
                     {user?.photoUrl ? <img src={user.photoUrl} alt="User" style={{ borderRadius: '50%', width: '100%', height: '100%' }} /> : 'Foto'}
                 </div>
-                <h3 style={{ fontSize: '1.1rem', marginBottom: '0.25rem' }}>¡Hola {user?.name.split(' ')[0]} {path === '/' /* just a trick to get surname if needed, but simplified per request */}!</h3>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.1rem', fontWeight: 600 }}>
+                    Hola {user?.firstName}
+                </h3>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.25rem', fontWeight: 400 }}>
+                    {user?.lastName}
+                </h3>
                 <p style={{ fontSize: '0.85rem', color: 'var(--color-primary)' }}>{user?.role}</p>
             </div>
 

@@ -90,7 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Fetching profile...
         supabase
             .from('profiles')
-            .select('job_title')
+            .select('job_title, first_name, last_name')
             .eq('id', supabaseUser.id)
             .single()
             .then(({ data }) => {
@@ -99,6 +99,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     name: supabaseUser.user_metadata.full_name || supabaseUser.email?.split('@')[0] || 'Usuario',
                     email: supabaseUser.email || '',
                     role: data?.job_title || 'Colaborador', // Use DB job_title
+                    firstName: data?.first_name || supabaseUser.user_metadata.full_name?.split(' ')[0] || 'Usuario',
+                    lastName: data?.last_name || '',
                     photoUrl: supabaseUser.user_metadata.avatar_url || '',
                     department: 'General',
                     location: 'Oficina Central',
