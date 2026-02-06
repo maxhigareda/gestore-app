@@ -75,8 +75,8 @@ const VacationRequestModal: React.FC<VacationRequestModalProps> = ({
                     end_date: endDate,
                     days_requested: daysRequested,
                     status: 'Solicitada',
-                    type: 'Vacaciones'
-                    // reason: comment // Removed per previous fix
+                    type: 'Vacaciones',
+                    reason: comment
                 });
                 if (error) throw error;
             } else if (mode === 'edit' && initialData?.id) {
@@ -84,7 +84,7 @@ const VacationRequestModal: React.FC<VacationRequestModalProps> = ({
                     start_date: startDate,
                     end_date: endDate,
                     days_requested: daysRequested,
-                    // reason: comment 
+                    reason: comment
                 }).eq('id', initialData.id);
                 if (error) throw error;
             }

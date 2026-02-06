@@ -23,6 +23,7 @@ export interface VacationRequest {
     days_requested: number;
     status: 'Solicitada' | 'Aprobada' | 'Rechazada';
     type: string;
+    reason?: string;
 }
 
 export interface VacationPeriod {
