@@ -59,6 +59,7 @@ const PermissionRequestModal: React.FC<PermissionRequestModalProps> = ({ onClose
 
             {/* Date Inputs */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                {/* ... existing date inputs ... */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <label style={labelStyle}>Fecha de inicio</label>
                     <input
@@ -81,11 +82,14 @@ const PermissionRequestModal: React.FC<PermissionRequestModalProps> = ({ onClose
                 </div>
             </div>
 
-            {/* Days Count Info */}
+            {/* Validation/Feedback Message */}
             {startDate && endDate && (
                 <div style={{
+                    padding: '10px',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderRadius: '6px',
                     textAlign: 'center',
-                    color: 'var(--color-primary)',
+                    color: '#60a5fa',
                     fontWeight: 500
                 }}>
                     Estás solicitando {daysRequested} días de permiso

@@ -71,7 +71,8 @@ const VacacionesTab: React.FC = () => {
             // Risk: Users says "Leave info dummie".
             // Compromise: I will use the `MOCK_DISPLAY_REQUESTS` if DB is empty, effectively "leaving dummy info".
 
-            const reqsToUse = typedRequests.length > 0 ? typedRequests : MOCK_DISPLAY_REQUESTS;
+            // If No requests, strictly use DB data. No mocks.
+            const reqsToUse = typedRequests;
             setRequests(reqsToUse);
 
             const calculatedPeriods = calculateVacationPeriods(entryDate, reqsToUse);

@@ -117,29 +117,19 @@ const PortalPage: React.FC = () => {
                     metricLabel="Días restantes"
                     metricValue={loading ? "..." : (
                         <span>
-                            {vacationBalance + vacationPending} días
+                            {vacationBalance} días
                             {vacationPending > 0 && (
-                                <span style={{ fontSize: '0.9rem', fontWeight: 400, marginLeft: '8px', color: '#555' }}>
+                                <span style={{ fontSize: '0.85rem', fontWeight: 400, marginLeft: '8px', color: 'var(--color-text-muted)' }}>
                                     ({vacationPending} solicitados)
                                 </span>
                             )}
                         </span>
-                    )}
-                    buttonLabel="Solicitar"
-                    onButtonClick={() => setActiveModal('vacation')}
-                    color="#575fa0" // Muted Indigo/Blue
-                />
-
-                {/* Permission Card */}
-                <QuickActionCard
-                    title="Solicitar Permiso"
-                    icon={<UserCheck size={24} />}
-                    metricLabel="Días pedidos este año"
+                    )} // ...
                     metricValue={loading ? "..." : (
                         <span>
                             {permissionDays} días
                             {permissionPending > 0 && (
-                                <span style={{ fontSize: '0.85rem', fontWeight: 400, marginLeft: '8px', color: '#666' }}>
+                                <span style={{ fontSize: '0.85rem', fontWeight: 400, marginLeft: '8px', color: 'var(--color-text-muted)' }}>
                                     ({permissionPending} solicitados)
                                 </span>
                             )}
