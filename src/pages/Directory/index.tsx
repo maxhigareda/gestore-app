@@ -9,6 +9,7 @@ interface Profile {
     last_name: string;
     full_name?: string; // Optional if we construct it
     photo_url: string;
+    avatar_url?: string;
     job_title: string;
     department: string;
     supervisor: string;
@@ -118,7 +119,7 @@ const DirectoryPage: React.FC = () => {
                                 <tr key={profile.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                                     <td style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
                                         <img
-                                            src={profile.photo_url || 'https://via.placeholder.com/40'}
+                                            src={profile.photo_url || profile.avatar_url || 'https://via.placeholder.com/40'}
                                             alt={profile.full_name}
                                             style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
                                         />

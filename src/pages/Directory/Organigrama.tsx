@@ -10,6 +10,7 @@ interface OrgProfile {
     last_name: string;
     job_title: string;
     photo_url: string | null;
+    avatar_url?: string | null;
     manager_id: string | null;
     _count?: number; // Subordinate count
 }
@@ -101,8 +102,8 @@ const OrgNode: React.FC<{
                     border: '2px solid #fff',
                     boxShadow: '0 0 0 1px #eee'
                 }}>
-                    {profile.photo_url ? (
-                        <img src={profile.photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    {(profile.photo_url || profile.avatar_url) ? (
+                        <img src={profile.photo_url || profile.avatar_url || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
                         <User size={24} color="#888" />
                     )}
