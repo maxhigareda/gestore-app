@@ -84,7 +84,8 @@ const VacacionesTab: React.FC = () => {
 
         const { error } = await supabase.from('vacation_requests').delete().eq('id', id);
         if (error) {
-            alert('Error al borrar');
+            console.error('Error erasing vacation request:', error);
+            alert(`Error al borrar: ${error.message}`);
         } else {
             fetchVacationData();
         }
