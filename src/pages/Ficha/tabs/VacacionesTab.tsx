@@ -213,34 +213,36 @@ const VacacionesTab: React.FC = () => {
                         </tbody>
                     </table>
                 </div>
-                {/* Request Manipulation Modal */}
-                {modalOpen && selectedRequest && (
+            </Card>
+
+            {/* Request Manipulation Modal */}
+            {modalOpen && selectedRequest && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+                }}>
                     <div style={{
-                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                        backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+                        backgroundColor: 'var(--color-surface)', padding: '2rem', borderRadius: '12px',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.2)', maxWidth: '500px', width: '100%'
                     }}>
-                        <div style={{
-                            backgroundColor: 'var(--color-surface)', padding: '2rem', borderRadius: '12px',
-                            boxShadow: '0 4px 20px rgba(0,0,0,0.2)', maxWidth: '500px', width: '100%'
-                        }}>
-                            <h3 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
-                                {modalMode === 'edit' ? 'Modificar Solicitud' : 'Detalles de Solicitud'}
-                            </h3>
-                            <VacationRequestModal
-                                balance={summary.currentRemaining}
-                                onClose={handleCloseModal}
-                                onSuccess={handleSuccess}
-                                mode={modalMode}
-                                initialData={{
-                                    id: selectedRequest.id,
-                                    startDate: selectedRequest.start_date,
-                                    endDate: selectedRequest.end_date,
-                                    comment: selectedRequest.reason
-                                }}
-                            />
-                        </div>
+                        <h3 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
+                            {modalMode === 'edit' ? 'Modificar Solicitud' : 'Detalles de Solicitud'}
+                        </h3>
+                        <VacationRequestModal
+                            balance={summary.currentRemaining}
+                            onClose={handleCloseModal}
+                            onSuccess={handleSuccess}
+                            mode={modalMode}
+                            initialData={{
+                                id: selectedRequest.id,
+                                startDate: selectedRequest.start_date,
+                                endDate: selectedRequest.end_date,
+                                comment: selectedRequest.reason
+                            }}
+                        />
                     </div>
-                )}
+                </div>
+            )}
         </div>
     );
 };

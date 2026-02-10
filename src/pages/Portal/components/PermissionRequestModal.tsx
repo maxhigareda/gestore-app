@@ -80,7 +80,7 @@ const PermissionRequestModal: React.FC<PermissionRequestModalProps> = ({
                 if (error) throw error;
             }
 
-            if (error) throw error;
+
             onSuccess();
         } catch (err: any) {
             console.error('Error submitting permission request:', err);
