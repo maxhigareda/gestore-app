@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { type UserProfile } from '../../../utils/mockData';
 import ResumenTab from '../tabs/ResumenTab';
 import VacacionesTab from '../tabs/VacacionesTab';
+import PermisosTab from '../tabs/PermisosTab';
 
 interface DetailsCardProps {
     user: UserProfile;
 }
 
-const TABS = ['Resumen', 'Documentos', 'Historia', 'Bitácora', 'Asistencia', 'Vacaciones'];
+const TABS = ['Resumen', 'Documentos', 'Historia', 'Bitácora', 'Asistencia', 'Vacaciones', 'Permisos'];
 
 const DetailsCard: React.FC<DetailsCardProps> = ({ user }) => {
     const [activeTab, setActiveTab] = useState('Resumen');
@@ -18,6 +19,8 @@ const DetailsCard: React.FC<DetailsCardProps> = ({ user }) => {
                 return <ResumenTab user={user} />;
             case 'Vacaciones':
                 return <VacacionesTab />;
+            case 'Permisos':
+                return <PermisosTab />;
             default:
                 return (
                     <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-muted)' }}>

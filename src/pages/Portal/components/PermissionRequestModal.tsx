@@ -4,6 +4,14 @@ import { supabase } from '../../../lib/supabaseClient';
 interface PermissionRequestModalProps {
     onClose: () => void;
     onSuccess: () => void;
+    mode?: 'create' | 'edit' | 'view';
+    initialData?: {
+        id: string;
+        startDate: string;
+        endDate: string;
+        type?: string;
+        comment?: string;
+    };
 }
 
 const PERMISSION_TYPES = [
@@ -15,11 +23,16 @@ const PERMISSION_TYPES = [
     'Permiso sin goce de sueldo'
 ];
 
-const PermissionRequestModal: React.FC<PermissionRequestModalProps> = ({ onClose, onSuccess }) => {
-    const [type, setType] = useState(PERMISSION_TYPES[0]);
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
-    const [comment, setComment] = useState('');
+const PermissionRequestModal: React.FC<PermissionRequestModalProps> = ({
+    onClose,
+    onSuccess,
+    mode = 'create',
+    initialData
+}) => {
+    const [type, setType] = useState(initialData?.type || PERMISSION_TYPES[0]);
+    const [startDate, setStartDate] = useState(initialData?.startDate || '');
+    const [endDate, setEndDate] = useState(initialData?.endDate || '');
+    const [comment, setComment] = useState(initialData?.comment || '');
     const [daysRequested, setDaysRequested] = useState(0);
 
     // Calculate days difference
@@ -44,14 +57,28 @@ const PermissionRequestModal: React.FC<PermissionRequestModalProps> = ({ onClose
             if (!user) throw new Error('No user logged in');
 
             // Note: 'type' removed because column likely doesn't exist in DB yet.
-            const { error } = await supabase.from('permission_requests').insert({
-                user_id: user.id,
-                start_date: startDate,
-                end_date: endDate,
-                days_requested: daysRequested,
-                reason: comment,
-                status: 'Solicitada'
-            });
+            // Update: 'type' and 'reason' columns added now.
+            if (mode === 'create') {
+                const { error } = await supabase.from('permission_requests').insert({
+                    user_id: user.id,
+                    start_date: startDate,
+                    end_date: endDate,
+                    days_requested: daysRequested,
+                    reason: comment,
+                    status: 'Solicitada',
+                    type: type
+                });
+                if (error) throw error;
+            } else if (mode === 'edit' && initialData?.id) {
+                const { error } = await supabase.from('permission_requests').update({
+                    start_date: startDate,
+                    end_date: endDate,
+                    days_requested: daysRequested,
+                    reason: comment,
+                    type: type
+                }).eq('id', initialData.id);
+                if (error) throw error;
+            }
 
             if (error) throw error;
             onSuccess();
@@ -69,8 +96,9 @@ const PermissionRequestModal: React.FC<PermissionRequestModalProps> = ({ onClose
                 <label style={labelStyle}>Tipo de Permiso</label>
                 <select
                     value={type}
+                    disabled={mode === 'view'}
                     onChange={(e) => setType(e.target.value)}
-                    style={inputStyle}
+                    style={{ ...inputStyle, opacity: mode === 'view' ? 0.7 : 1 }}
                 >
                     {PERMISSION_TYPES.map(t => (
                         <option key={t} value={t}>{t}</option>
@@ -86,9 +114,10 @@ const PermissionRequestModal: React.FC<PermissionRequestModalProps> = ({ onClose
                     <input
                         type="date"
                         required
+                        disabled={mode === 'view'}
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
-                        style={inputStyle}
+                        style={{ ...inputStyle, opacity: mode === 'view' ? 0.7 : 1 }}
                     />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -96,15 +125,16 @@ const PermissionRequestModal: React.FC<PermissionRequestModalProps> = ({ onClose
                     <input
                         type="date"
                         required
+                        disabled={mode === 'view'}
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
-                        style={inputStyle}
+                        style={{ ...inputStyle, opacity: mode === 'view' ? 0.7 : 1 }}
                     />
                 </div>
             </div>
 
             {/* Validation/Feedback Message */}
-            {startDate && endDate && (
+            {mode !== 'view' && startDate && endDate && (
                 <div style={{
                     padding: '10px',
                     backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -122,10 +152,11 @@ const PermissionRequestModal: React.FC<PermissionRequestModalProps> = ({ onClose
                 <label style={labelStyle}>Comentarios</label>
                 <textarea
                     rows={3}
+                    disabled={mode === 'view'}
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    style={{ ...inputStyle, resize: 'none' }}
-                    placeholder="Motivo del permiso..."
+                    style={{ ...inputStyle, resize: 'none', opacity: mode === 'view' ? 0.7 : 1 }}
+                    placeholder={mode === 'view' ? "Sin comentarios" : "Motivo del permiso..."}
                 />
             </div>
 
@@ -136,19 +167,21 @@ const PermissionRequestModal: React.FC<PermissionRequestModalProps> = ({ onClose
                     onClick={onClose}
                     style={secondaryButtonStyle}
                 >
-                    Cancelar
+                    {mode === 'view' ? 'Cerrar' : 'Cancelar'}
                 </button>
-                <button
-                    type="submit"
-                    disabled={daysRequested <= 0}
-                    style={{
-                        ...primaryButtonStyle,
-                        opacity: daysRequested > 0 ? 1 : 0.5,
-                        cursor: daysRequested > 0 ? 'pointer' : 'not-allowed'
-                    }}
-                >
-                    Solicitar
-                </button>
+                {mode !== 'view' && (
+                    <button
+                        type="submit"
+                        disabled={daysRequested <= 0}
+                        style={{
+                            ...primaryButtonStyle,
+                            opacity: daysRequested > 0 ? 1 : 0.5,
+                            cursor: daysRequested > 0 ? 'pointer' : 'not-allowed'
+                        }}
+                    >
+                        {mode === 'edit' ? 'Guardar Cambios' : 'Solicitar'}
+                    </button>
+                )}
             </div>
 
         </form>
