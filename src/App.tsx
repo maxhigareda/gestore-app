@@ -10,6 +10,7 @@ import PlaceholderPage from './components/PlaceholderPage';
 import FichaPage from './pages/Ficha';
 import EvaluationsPage from './pages/Evaluations';
 import PortalPage from './pages/Portal';
+import DirectoryPage from './pages/Directory';
 import OrganigramaPage from './pages/Directory/Organigrama';
 import AdminPage from './pages/Admin';
 import CollaboratorsPage from './pages/Admin/Collaborators';
