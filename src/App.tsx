@@ -14,6 +14,7 @@ import DirectoryPage from './pages/Directory';
 import OrganigramaPage from './pages/Directory/Organigrama';
 import AdminPage from './pages/Admin';
 import CollaboratorsPage from './pages/Admin/Collaborators';
+import CreateCollaborator from './pages/Admin/Collaborators/CreateCollaborator';
 import ActiveCollaborators from './pages/Admin/Collaborators/ActiveCollaborators';
 import OrganizationPage from './pages/Admin/Organization';
 import AttendancePage from './pages/Admin/Attendance';
