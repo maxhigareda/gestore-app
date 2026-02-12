@@ -404,8 +404,6 @@ const CreateCollaborator: React.FC = () => {
         </div>
     );
 };
-        </div >
-    );
-};
+
 
 export default CreateCollaborator;
