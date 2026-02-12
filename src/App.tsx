@@ -14,6 +14,7 @@ import DirectoryPage from './pages/Directory';
 import OrganigramaPage from './pages/Directory/Organigrama';
 import AdminPage from './pages/Admin';
 import CollaboratorsPage from './pages/Admin/Collaborators';
+import CreateCollaborator from './pages/Admin/Collaborators/CreateCollaborator';
 import OrganizationPage from './pages/Admin/Organization';
 import AttendancePage from './pages/Admin/Attendance';
 
@@ -63,6 +64,11 @@ function App() {
                 {/* Admin Module Routes */}
                 <Route path="admin" element={<AdminPage />} />
                 <Route path="admin/collaborators" element={<CollaboratorsPage />} />
+                <Route path="admin/collaborators/create" element={<CreateCollaborator />} />
+                <Route path="admin/collaborators/active" element={<PlaceholderPage title="Colaboradores Vigentes (En construcción)" />} />
+                <Route path="admin/collaborators/groups" element={<PlaceholderPage title="Grupos de Colaboradores (En construcción)" />} />
+                <Route path="admin/collaborators/requests" element={<PlaceholderPage title="Solicitudes (En construcción)" />} />
+
                 <Route path="admin/organization" element={<OrganizationPage />} />
                 <Route path="admin/attendance" element={<AttendancePage />} />
 

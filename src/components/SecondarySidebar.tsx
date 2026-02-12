@@ -122,7 +122,6 @@ const SecondarySidebar: React.FC = () => {
 
                 {openMenus['collaborators'] && (
                     <div style={{ paddingLeft: '1rem', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        <SubMenuLink label="Gestión General" onClick={() => navigate('/admin/collaborators')} />
                         <SubMenuLink label="Crear Colaborador" onClick={() => navigate('/admin/collaborators/create')} />
                         <SubMenuLink label="Vigentes" onClick={() => navigate('/admin/collaborators/active')} />
                         <SubMenuLink label="Grupos" onClick={() => navigate('/admin/collaborators/groups')} />
