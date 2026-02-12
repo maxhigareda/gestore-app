@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { supabase } from '../../../lib/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
 
 const CreateCollaborator: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -27,6 +29,7 @@ const CreateCollaborator: React.FC = () => {
         emergencyPhone: ''
     });
 
+    const [photoFile, setPhotoFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -55,6 +58,7 @@ const CreateCollaborator: React.FC = () => {
     const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
+            setPhotoFile(file);
             const reader = new FileReader();
             reader.onloadend = () => {
                 setPreviewUrl(reader.result as string);
@@ -75,6 +79,128 @@ const CreateCollaborator: React.FC = () => {
         }
     };
 
+    const [loading, setLoading] = useState(false);
+    const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setFeedback(null);
+
+        try {
+            // 1. Upload Photo if exists
+            let photoUrl = null;
+            if (photoFile) {
+                const fileExt = photoFile.name.split('.').pop();
+                const fileName = `${Math.random()}.${fileExt}`;
+                const filePath = `${fileName}`;
+
+                const { error: uploadError } = await supabase.storage
+                    .from('avatars')
+                    .upload(filePath, photoFile);
+
+                if (uploadError) throw new Error(`Error al subir foto: ${uploadError.message}`);
+
+                const { data: publicUrlData } = supabase.storage
+                    .from('avatars')
+                    .getPublicUrl(filePath);
+
+                photoUrl = publicUrlData.publicUrl;
+            }
+
+            // 2. Create Profile Data object
+            // Ideally we would create the auth user here, but for now we focus on data entry.
+            // Since we can't create auth users client-side without logging out, 
+            // we will simulate the creation by inserting into profiles directly IF RLS allows it 
+            // OR if we are just storing data.
+            // IMPORTANT: 'profiles' usually references 'auth.users'. 
+            // If we don't have a trigger to create the profile, we can insert it.
+            // BUT 'id' must exist in auth.users.
+            // WORKAROUND: For this demo/MVP without Edge Functions, we will:
+            // a) Create a "secondary" client to sign up the user (preserve admin session).
+            // b) OR warn the admin.
+
+            // Let's try the secondary client approach which is cleaner.
+            const secondaryClient = createClient(
+                import.meta.env.VITE_SUPABASE_URL,
+                import.meta.env.VITE_SUPABASE_ANON_KEY
+            );
+
+            // Create temporary password (could be random or default)
+            const tempPassword = "TempPassword123!";
+
+            const { data: authData, error: authError } = await secondaryClient.auth.signUp({
+                email: formData.emailCorporate,
+                password: tempPassword,
+                options: {
+                    data: {
+                        full_name: `${formData.firstName} ${formData.lastName}`,
+                    }
+                }
+            });
+
+            if (authError) throw new Error(`Error al crear usuario de autenticación: ${authError.message}`);
+            if (!authData.user) throw new Error("No se pudo obtener el ID del usuario creado.");
+
+            const newUserId = authData.user.id;
+
+            // 3. Update the Profile with all details
+            // The trigger might have created the profile with basic info. We update it.
+            const updates = {
+                id: newUserId,
+                first_name: formData.firstName,
+                last_name: formData.lastName,
+                // full_name is already set by trigger but we can ensure consistency
+                full_name: `${formData.firstName} ${formData.lastName} ${formData.lastNameMother || ''}`.trim(),
+                email: formData.emailCorporate,
+                gender: formData.gender,
+                birth_country: formData.birthCountry,
+                document_type: formData.documentType,
+                rfc: formData.rfc,
+                curp: formData.curp,
+                nss: formData.nss,
+                marital_status: formData.maritalStatus,
+                birth_date: formData.birthDate,
+                phone_office: formData.phoneOffice,
+                phone_personal: formData.phonePersonal,
+                email_personal: formData.emailPersonal,
+                address: `${formData.addressStreet}, ${formData.addressMunicipality}, ${formData.addressState}, CP ${formData.addressZip}`,
+                address_state: formData.addressState,
+                address_municipality: formData.addressMunicipality,
+                address_zip_code: formData.addressZip,
+                company_entry_date: formData.companyEntryDate,
+                payment_method: formData.paymentMethod,
+                emergency_contact_name: formData.emergencyName,
+                emergency_contact_phone: formData.emergencyPhone,
+                photo_url: photoUrl,
+                updated_at: new Date()
+            };
+
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .update(updates)
+                .eq('id', newUserId);
+
+            if (profileError) {
+                // If update fails (maybe row doesn't exist yet because trigger is slow?), try upsert
+                const { error: upsertError } = await supabase
+                    .from('profiles')
+                    .upsert(updates);
+                if (upsertError) throw new Error(`Error al guardar perfil: ${upsertError.message}`);
+            }
+
+            setFeedback({ type: 'success', message: 'Colaborador creado exitosamente.' });
+            // Optional: Reset form or redirect
+            // setFormData(initialState); 
+
+        } catch (error: any) {
+            console.error(error);
+            setFeedback({ type: 'error', message: error.message || 'Error desconocido.' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const isMexico = formData.birthCountry === 'México';
 
     return (
@@ -83,7 +209,20 @@ const CreateCollaborator: React.FC = () => {
                 Nuevo Colaborador
             </h1>
 
-            <form style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+            {feedback && (
+                <div style={{
+                    padding: '1rem',
+                    marginBottom: '1rem',
+                    borderRadius: '6px',
+                    backgroundColor: feedback.type === 'success' ? 'rgba(0, 202, 114, 0.1)' : 'rgba(226, 68, 92, 0.1)',
+                    border: `1px solid ${feedback.type === 'success' ? 'var(--color-success)' : 'var(--color-danger)'}`,
+                    color: feedback.type === 'success' ? 'var(--color-success)' : 'var(--color-danger)'
+                }}>
+                    {feedback.message}
+                </div>
+            )}
+
+            <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                 {/* Photo Upload Section */}
                 <div style={{ gridColumn: '1 / -1', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '2rem' }}>
                     <div style={{
@@ -349,8 +488,8 @@ const CreateCollaborator: React.FC = () => {
                 </div>
 
                 <div style={{ gridColumn: '1 / -1', marginTop: '2rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-                    <button type="submit" className="btn-primary" style={{ backgroundColor: 'var(--color-primary)', color: 'white', padding: '0.8rem 2rem', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
-                        Crear Colaborador
+                    <button type="submit" disabled={loading} className="btn-primary" style={{ backgroundColor: 'var(--color-primary)', color: 'white', padding: '0.8rem 2rem', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 600, opacity: loading ? 0.7 : 1 }}>
+                        {loading ? 'Guardando...' : 'Crear Colaborador'}
                     </button>
                 </div>
 
