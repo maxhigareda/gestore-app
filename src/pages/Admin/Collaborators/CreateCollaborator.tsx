@@ -37,11 +37,11 @@ const CreateCollaborator: React.FC = () => {
 
     const downloadTemplate = () => {
         const headers = [
-            "firstName", "lastName", "lastNameMother", "gender", "birthCountry",
-            "documentType", "rfc", "curp", "nss", "maritalStatus", "birthDate",
-            "phoneOffice", "phonePersonal", "emailCorporate", "emailPersonal",
-            "addressStreet", "addressState", "addressMunicipality", "addressZip",
-            "paymentMethod", "companyEntryDate", "emergencyName", "emergencyPhone"
+            "Nombre", "Apellido Paterno", "Apellido Materno", "Genero", "Pais Nacimiento",
+            "Tipo Documento", "RFC", "CURP", "NSS", "Estado Civil", "Fecha Nacimiento",
+            "Telefono Oficina", "Telefono Personal", "Email Corporativo", "Email Personal",
+            "Calle y Numero", "Estado", "Municipio", "Codigo Postal",
+            "Metodo Pago", "Fecha Ingreso", "Nombre Emergencia", "Telefono Emergencia"
         ];
         const csvContent = "data:text/csv;charset=utf-8," + headers.join(",");
         const encodedUri = encodeURI(csvContent);
@@ -72,7 +72,7 @@ const CreateCollaborator: React.FC = () => {
 
     const processCSV = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            alert("Funcionalidad de Carga Masiva (CSV) simulada: Archivo seleccionado.");
+            alert("Funcionalidad de Carga Masiva (CSV) simulada: Archivo seleccionado. Se esperan encabezados en español.");
             // Here we would call parseCSV and loop through inserts
         }
     };
@@ -107,8 +107,8 @@ const CreateCollaborator: React.FC = () => {
                         )}
                     </div>
                     <div>
-                        <label className="btn-secondary" style={{ cursor: 'pointer', padding: '0.5rem 1rem', display: 'inline-block' }}>
-                            Subir Foto
+                        <label className="btn-secondary" style={{ cursor: 'pointer', display: 'inline-block' }}>
+                            📷 Subir Foto
                             <input type="file" accept="image/*" onChange={handlePhotoChange} style={{ display: 'none' }} />
                         </label>
                         <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: '0.5rem' }}>
@@ -158,8 +158,31 @@ const CreateCollaborator: React.FC = () => {
                     <label>País de Nacimiento*</label>
                     <select name="birthCountry" value={formData.birthCountry} onChange={handleChange} required className="input-field">
                         <option value="México">México</option>
-                        <option value="Estados Unidos">Estados Unidos</option>
-                        <option value="Canadá">Canadá</option>
+                        <optgroup label="Norteamérica">
+                            <option value="Estados Unidos">Estados Unidos</option>
+                            <option value="Canadá">Canadá</option>
+                        </optgroup>
+                        <optgroup label="Centroamérica">
+                            <option value="Belice">Belice</option>
+                            <option value="Costa Rica">Costa Rica</option>
+                            <option value="El Salvador">El Salvador</option>
+                            <option value="Guatemala">Guatemala</option>
+                            <option value="Honduras">Honduras</option>
+                            <option value="Nicaragua">Nicaragua</option>
+                            <option value="Panamá">Panamá</option>
+                        </optgroup>
+                        <optgroup label="Sudamérica">
+                            <option value="Argentina">Argentina</option>
+                            <option value="Bolivia">Bolivia</option>
+                            <option value="Brasil">Brasil</option>
+                            <option value="Chile">Chile</option>
+                            <option value="Colombia">Colombia</option>
+                            <option value="Ecuador">Ecuador</option>
+                            <option value="Paraguay">Paraguay</option>
+                            <option value="Perú">Perú</option>
+                            <option value="Uruguay">Uruguay</option>
+                            <option value="Venezuela">Venezuela</option>
+                        </optgroup>
                         <option value="Otro">Otro</option>
                     </select>
                 </div>
@@ -191,13 +214,16 @@ const CreateCollaborator: React.FC = () => {
                     <label>Tipo de Documento</label>
                     <select name="documentType" value={isMexico ? 'RFC' : formData.documentType} disabled={isMexico} onChange={handleChange} className="input-field">
                         <option value="RFC">RFC</option>
+                        <option value="DNI">DNI</option>
+                        <option value="Pasaporte">Pasaporte</option>
+                        <option value="Licencia">Licencia</option>
                         <option value="Otro">Otro</option>
                     </select>
                 </div>
 
                 <div className="form-group">
-                    <label>RFC*</label>
-                    <input type="text" name="rfc" value={formData.rfc} onChange={handleChange} required className="input-field" />
+                    <label>{isMexico ? 'RFC (México)*' : 'Identificación / RFC*'}</label>
+                    <input type="text" name="rfc" value={formData.rfc} onChange={handleChange} required className="input-field" placeholder={isMexico ? "RFC con Homoclave" : "ID Documento"} />
                 </div>
 
                 <div className="form-group">
@@ -243,13 +269,41 @@ const CreateCollaborator: React.FC = () => {
                     {isMexico ? (
                         <select name="addressState" value={formData.addressState} onChange={handleChange} required className="input-field">
                             <option value="">Seleccione...</option>
-                            <option value="CDMX">Ciudad de México</option>
+                            <option value="Aguascalientes">Aguascalientes</option>
+                            <option value="Baja California">Baja California</option>
+                            <option value="Baja California Sur">Baja California Sur</option>
+                            <option value="Campeche">Campeche</option>
+                            <option value="Chiapas">Chiapas</option>
+                            <option value="Chihuahua">Chihuahua</option>
+                            <option value="Ciudad de México">Ciudad de México</option>
+                            <option value="Coahuila">Coahuila</option>
+                            <option value="Colima">Colima</option>
+                            <option value="Durango">Durango</option>
+                            <option value="Guanajuato">Guanajuato</option>
+                            <option value="Guerrero">Guerrero</option>
+                            <option value="Hidalgo">Hidalgo</option>
                             <option value="Jalisco">Jalisco</option>
+                            <option value="México">México</option>
+                            <option value="Michoacán">Michoacán</option>
+                            <option value="Morelos">Morelos</option>
+                            <option value="Nayarit">Nayarit</option>
                             <option value="Nuevo León">Nuevo León</option>
-                            {/* Add more states later */}
+                            <option value="Oaxaca">Oaxaca</option>
+                            <option value="Puebla">Puebla</option>
+                            <option value="Querétaro">Querétaro</option>
+                            <option value="Quintana Roo">Quintana Roo</option>
+                            <option value="San Luis Potosí">San Luis Potosí</option>
+                            <option value="Sinaloa">Sinaloa</option>
+                            <option value="Sonora">Sonora</option>
+                            <option value="Tabasco">Tabasco</option>
+                            <option value="Tamaulipas">Tamaulipas</option>
+                            <option value="Tlaxcala">Tlaxcala</option>
+                            <option value="Veracruz">Veracruz</option>
+                            <option value="Yucatán">Yucatán</option>
+                            <option value="Zacatecas">Zacatecas</option>
                         </select>
                     ) : (
-                        <input type="text" name="addressState" value={formData.addressState} onChange={handleChange} required className="input-field" />
+                        <input type="text" name="addressState" value={formData.addressState} onChange={handleChange} required className="input-field" placeholder="Estado / Provincia" />
                     )}
                 </div>
 
@@ -297,7 +351,6 @@ const CreateCollaborator: React.FC = () => {
                 </div>
 
                 <div style={{ gridColumn: '1 / -1', marginTop: '2rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-                    <button type="button" className="btn-secondary">Cancelar</button>
                     <button type="submit" className="btn-primary" style={{ backgroundColor: 'var(--color-primary)', color: 'white', padding: '0.8rem 2rem', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
                         Crear Colaborador
                     </button>
@@ -331,8 +384,27 @@ const CreateCollaborator: React.FC = () => {
                     background-color: var(--color-background);
                     cursor: not-allowed;
                 }
+                /* Defined specifically for this page to ensure visibility */
+                .btn-secondary {
+                    background-color: var(--color-surface);
+                    color: var(--color-text-primary);
+                    border: 1px solid var(--border-color);
+                    padding: 0.6rem 1.2rem;
+                    border-radius: 6px;
+                    font-weight: 500;
+                    font-size: 0.9rem;
+                    transition: all 0.2s;
+                }
+                .btn-secondary:hover {
+                    background-color: var(--color-hover);
+                    border-color: var(--color-text-secondary);
+                    color: white;
+                }
             `}</style>
         </div>
+    );
+};
+        </div >
     );
 };
 
