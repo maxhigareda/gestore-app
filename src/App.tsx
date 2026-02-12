@@ -13,6 +13,9 @@ import PortalPage from './pages/Portal';
 import TrainingPage from './pages/Training';
 import DirectoryPage from './pages/Directory';
 import OrganigramaPage from './pages/Directory/Organigrama';
+import CollaboratorsPage from './pages/Admin/Collaborators';
+import OrganizationPage from './pages/Admin/Organization';
+import AttendancePage from './pages/Admin/Attendance';
 
 // Protected Route Component
 const ProtectedRoute = () => {
@@ -54,11 +57,16 @@ function App() {
                 {/* Growth & Feedback */}
                 <Route path="evaluations" element={<EvaluationsPage />} />
                 <Route path="surveys" element={<PlaceholderPage title="Mis Encuestas" />} />
-                <Route path="training-my" element={<TrainingPage />} />
+                <Route path="training-my" element={<h1 style={{ padding: '2rem' }}>Mis Capacitaciones (En construcción)</h1>} />
                 <Route path="recognition" element={<PlaceholderPage title="Reconocimientos" />} />
 
+                {/* Admin Module Routes */}
+                <Route path="admin" element={<AdminPage />} />
+                <Route path="admin/collaborators" element={<CollaboratorsPage />} />
+                <Route path="admin/organization" element={<OrganizationPage />} />
+                <Route path="admin/attendance" element={<AttendancePage />} />
+
                 {/* Other Module Placeholders */}
-                <Route path="admin/*" element={<PlaceholderPage title="Módulo Administrativo" />} />
                 <Route path="org-dev/*" element={<PlaceholderPage title="Desarrollo Organizacional" />} />
                 <Route path="training/*" element={<PlaceholderPage title="Gestión de Capacitaciones" />} />
               </Route>

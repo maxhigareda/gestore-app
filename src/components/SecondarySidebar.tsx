@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, FileText, BookOpen, Network, Contact } from 'lucide-react';
+import { LayoutDashboard, FileText, BookOpen, Network, Contact, Users, ClipboardList } from 'lucide-react';
 
 const SecondarySidebar: React.FC = () => {
     const { user } = useAuth();
@@ -99,7 +99,54 @@ const SecondarySidebar: React.FC = () => {
 
             <div style={{ flex: 1, overflowY: 'auto' }}>
                 {isHomeModule && renderHomeMenu()}
-                {isAdminModule && <div style={{ padding: '1.5rem' }}><h3>Administrativo</h3><p>Submenú...</p></div>}
+                {isAdminModule && (
+                    <div style={{ padding: '0 0.5rem' }}>
+                        <div style={{ padding: '1.5rem 1rem 0.5rem 1rem' }}>
+                            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '0.5rem' }}>Administrativo</h3>
+                        </div>
+
+                        {/* Colaboradores Group */}
+                        <div style={{ marginBottom: '1rem' }}>
+                            <h4 style={{ padding: '0 1rem', fontSize: '0.85rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                                Colaboradores
+                            </h4>
+                            <SidebarLink to="/admin/collaborators" icon={<Users size={16} />} label="Gestión General" />
+                            {/* Sub-items technically don't have routes yet, pointing to same for now or anchors */}
+                            <div style={{ paddingLeft: '2.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.25rem' }}>
+                                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', cursor: 'pointer' }}>• Crear Colaborador</span>
+                                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', cursor: 'pointer' }}>• Vigentes</span>
+                                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', cursor: 'pointer' }}>• Grupos</span>
+                                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', cursor: 'pointer' }}>• Solicitudes</span>
+                            </div>
+                        </div>
+
+                        {/* Organization Group */}
+                        <div style={{ marginBottom: '1rem' }}>
+                            <h4 style={{ padding: '0 1rem', fontSize: '0.85rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                                Organización
+                            </h4>
+                            <SidebarLink to="/admin/organization" icon={<Network size={16} />} label="Gestión Org." />
+                            <div style={{ paddingLeft: '2.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.25rem' }}>
+                                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', cursor: 'pointer' }}>• Cargos</span>
+                                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', cursor: 'pointer' }}>• Áreas</span>
+                                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', cursor: 'pointer' }}>• Puestos</span>
+                            </div>
+                        </div>
+
+                        {/* Attendance Group */}
+                        <div style={{ marginBottom: '1rem' }}>
+                            <h4 style={{ padding: '0 1rem', fontSize: '0.85rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                                Asistencia
+                            </h4>
+                            <SidebarLink to="/admin/attendance" icon={<ClipboardList size={16} />} label="Gestión Asistencia" />
+                            <div style={{ paddingLeft: '2.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.25rem' }}>
+                                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', cursor: 'pointer' }}>• Ausencias</span>
+                                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', cursor: 'pointer' }}>• Calendario</span>
+                                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', cursor: 'pointer' }}>• Incapacidades</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
                 {isOrgDevModule && <div style={{ padding: '1.5rem' }}><h3>Desarrollo Org.</h3><p>Submenú...</p></div>}
                 {isTrainingModule && <div style={{ padding: '1.5rem' }}><h3>Capacitaciones</h3><p>Submenú...</p></div>}
             </div>
