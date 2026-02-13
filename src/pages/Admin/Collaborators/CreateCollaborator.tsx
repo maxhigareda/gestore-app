@@ -190,8 +190,38 @@ const CreateCollaborator: React.FC = () => {
             }
 
             setFeedback({ type: 'success', message: 'Colaborador creado exitosamente.' });
-            // Optional: Reset form or redirect
-            // setFormData(initialState); 
+
+            // Reset form
+            setFormData({
+                firstName: '',
+                lastName: '',
+                lastNameMother: '',
+                gender: '',
+                birthCountry: 'México',
+                documentType: 'RFC',
+                rfc: '',
+                curp: '',
+                nss: '',
+                maritalStatus: '',
+                birthDate: '',
+                phoneOffice: '',
+                phonePersonal: '',
+                emailCorporate: '',
+                emailPersonal: '',
+                addressStreet: '',
+                addressState: '',
+                addressMunicipality: '',
+                addressZip: '',
+                paymentMethod: '',
+                companyEntryDate: '',
+                emergencyName: '',
+                emergencyPhone: ''
+            });
+            setPhotoFile(null);
+            setPreviewUrl(null);
+
+            // Optional: Scroll to top
+            window.scrollTo(0, 0);
 
         } catch (error: any) {
             console.error(error);

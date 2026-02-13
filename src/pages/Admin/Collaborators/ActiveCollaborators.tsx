@@ -49,9 +49,12 @@ const ActiveCollaborators: React.FC = () => {
 
             const { data, error, count } = await query;
 
-            if (error) throw error;
+            if (error) {
+                console.error('Supabase Error:', error);
+                throw error;
+            }
 
-            setCollaborators(data || []);
+            console.log('Collaborators found:', data?.length); // Debug info
             setTotalCount(count || 0);
 
         } catch (error) {
