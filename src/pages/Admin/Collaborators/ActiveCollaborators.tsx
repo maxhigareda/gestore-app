@@ -55,6 +55,7 @@ const ActiveCollaborators: React.FC = () => {
             }
 
             console.log('Collaborators found:', data?.length); // Debug info
+            setCollaborators(data || []);
             setTotalCount(count || 0);
 
         } catch (error) {
