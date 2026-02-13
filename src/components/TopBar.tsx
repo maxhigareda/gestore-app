@@ -1,11 +1,19 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
+import { LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const TopBar: React.FC = () => {
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
 
     // Create initials or use first char
-    const initial = user?.name?.charAt(0) || 'U';
+    const initial = user?.firstName?.charAt(0) || user?.name?.charAt(0) || 'U';
 
     return (
         <header style={{
@@ -14,10 +22,10 @@ const TopBar: React.FC = () => {
             alignItems: 'center',
             justifyContent: 'flex-end', // Right aligned items
             padding: '0 2rem',
-            // borderBottom: '1px solid var(--border-color)',
-            backgroundColor: 'transparent' // Often transparent in modern dashboards if main content covers it, or match background
+            backgroundColor: 'transparent'
         }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ fontSize: '14px', fontWeight: 500 }}>{user?.firstName || user?.name}</span>
                 <div style={{
                     width: '36px',
                     height: '36px',
@@ -25,6 +33,7 @@ const TopBar: React.FC = () => {
                     backgroundColor: 'var(--color-primary)', // Placeholder if no image
                     backgroundImage: user?.photoUrl ? `url(${user.photoUrl})` : 'none',
                     backgroundSize: 'cover',
+                    backgroundPosition: 'center',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -34,7 +43,24 @@ const TopBar: React.FC = () => {
                 }}>
                     {!user?.photoUrl && initial}
                 </div>
-                <span style={{ fontSize: '14px', fontWeight: 500 }}>{user?.name.split(' ')[0]}</span>
+
+                <button
+                    onClick={handleLogout}
+                    title="Cerrar Sesión"
+                    style={{
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: 'var(--color-text-secondary)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '4px',
+                        marginLeft: '8px'
+                    }}
+                >
+                    <LogOut size={20} />
+                </button>
             </div>
         </header>
     );
