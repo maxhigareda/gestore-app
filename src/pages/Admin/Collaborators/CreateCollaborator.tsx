@@ -145,12 +145,10 @@ const CreateCollaborator: React.FC = () => {
             const newUserId = authData.user.id;
 
             // 3. Update the Profile with all details
-            // The trigger might have created the profile with basic info. We update it.
             const updates = {
                 id: newUserId,
                 first_name: formData.firstName,
                 last_name: formData.lastName,
-                // full_name is already set by trigger but we can ensure consistency
                 full_name: `${formData.firstName} ${formData.lastName} ${formData.lastNameMother || ''}`.trim(),
                 email: formData.emailCorporate,
                 gender: formData.gender,
@@ -176,17 +174,28 @@ const CreateCollaborator: React.FC = () => {
                 updated_at: new Date()
             };
 
-            const { error: profileError } = await supabase
+            // We use select() to verify if the row was actually found and updated.
+            const { data: updateData, error: profileError } = await supabase
                 .from('profiles')
                 .update(updates)
-                .eq('id', newUserId);
+                .eq('id', newUserId)
+                .select();
 
-            if (profileError) {
-                // If update fails (maybe row doesn't exist yet because trigger is slow?), try upsert
+            if (profileError) throw new Error(`Error al actualizar perfil: ${profileError.message}`);
+
+            // If no row was updated, it means either:
+            // a) The trigger handle_new_user didn't run (so profile doesn't exist).
+            // b) RLS blocked the visibility of the new profile.
+            // We try to UPSERT to cover case (a).
+            if (!updateData || updateData.length === 0) {
+                console.warn("Update returned 0 rows. Attempting upsert...");
                 const { error: upsertError } = await supabase
                     .from('profiles')
                     .upsert(updates);
-                if (upsertError) throw new Error(`Error al guardar perfil: ${upsertError.message}`);
+
+                if (upsertError) {
+                    throw new Error(`Error al crear perfil (Upsert falló): ${upsertError.message}. Posible problema de permisos RLS.`);
+                }
             }
 
             setFeedback({ type: 'success', message: 'Colaborador creado exitosamente.' });
