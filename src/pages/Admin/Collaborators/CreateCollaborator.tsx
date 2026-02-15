@@ -681,6 +681,53 @@ const CreateCollaborator: React.FC = () => {
                             </select>
                         </div>
 
+                        <div className="form-group">
+                            <label>Sueldo Base (Mensual)</label>
+                            <input type="number" name="salary" value={formData.salary} onChange={handleChange} className="input-field" placeholder="0.00" />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Tipo de Compensación</label>
+                            <select name="compensationType" value={formData.compensationType} onChange={handleChange} className="input-field">
+                                <option value="">Seleccione...</option>
+                                <option value="Fijo">Fijo</option>
+                                <option value="Variable">Variable</option>
+                                <option value="Mixto">Mixto</option>
+                            </select>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Tipo de Jornada</label>
+                            <select name="workShift" value={formData.workShift} onChange={handleChange} className="input-field">
+                                <option value="">Seleccione...</option>
+                                <option value="Diurna">Diurna</option>
+                                <option value="Nocturna">Nocturna</option>
+                                <option value="Mixta">Mixta</option>
+                            </select>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Horario (Ej. 9:00 - 18:00)</label>
+                            <input type="text" name="workSchedule" value={formData.workSchedule} onChange={handleChange} className="input-field" />
+                        </div>
+
+                        <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                            <label style={{ marginBottom: '0.5rem', display: 'block' }}>Días de Jornada</label>
+                            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                                {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map(day => (
+                                    <label key={day} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.9rem' }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.workDays?.includes(day)}
+                                            onChange={() => handleWorkDaysChange(day)}
+                                            style={{ accentColor: 'var(--color-primary)' }}
+                                        />
+                                        {day}
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+
                         <hr style={{ gridColumn: '1 / -1', border: '0', borderTop: '1px solid var(--border-color)', margin: '1rem 0' }} />
 
                         <div className="form-group">
@@ -736,6 +783,67 @@ const CreateCollaborator: React.FC = () => {
                 </div>
 
             </form>
+
+            {/* CSV Preview Modal */}
+            {showCsvModal && csvPreview && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                    <div style={{
+                        backgroundColor: 'var(--color-surface)',
+                        padding: '2rem',
+                        borderRadius: '8px',
+                        width: '90%',
+                        maxWidth: '900px',
+                        maxHeight: '90vh',
+                        overflowY: 'auto',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
+                    }}>
+                        <h2 style={{ marginBottom: '1rem' }}>Previsualización de Carga Masiva</h2>
+                        <p style={{ marginBottom: '1rem', color: 'var(--color-text-secondary)' }}>
+                            Revisa los datos antes de importar. Filas con <span style={{ color: 'red' }}>X</span> tienen errores.
+                        </p>
+
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '2px solid var(--border-color)', textAlign: 'left' }}>
+                                    <th style={{ padding: '0.5rem' }}>Estado</th>
+                                    <th style={{ padding: '0.5rem' }}>Nombre</th>
+                                    <th style={{ padding: '0.5rem' }}>Apellido</th>
+                                    <th style={{ padding: '0.5rem' }}>Email</th>
+                                    <th style={{ padding: '0.5rem' }}>Puesto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {csvPreview.map((row, idx) => (
+                                    <tr key={idx} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                                        <td style={{ padding: '0.5rem', textAlign: 'center' }}>
+                                            {row.isValid ?
+                                                <span style={{ color: 'green', fontWeight: 'bold' }}>✓</span> :
+                                                <span style={{ color: 'red', fontWeight: 'bold' }} title={row.errors?.join(', ')}>X</span>
+                                            }
+                                        </td>
+                                        <td style={{ padding: '0.5rem' }}>{row['Nombre']}</td>
+                                        <td style={{ padding: '0.5rem' }}>{row['Apellido Paterno']}</td>
+                                        <td style={{ padding: '0.5rem' }}>{row['Email Corporativo']}</td>
+                                        <td style={{ padding: '0.5rem' }}>{row['Puesto'] || row['Role'] || '-'}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+
+                        <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                            <button type="button" onClick={() => setShowCsvModal(false)} className="btn-secondary">Cancelar</button>
+                            <button type="button" onClick={confirmBulkImport} className="btn-primary"
+                                disabled={!csvPreview.some(r => r.isValid)}>
+                                Importar {csvPreview.filter(r => r.isValid).length} Registros
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <style>{`
                 .form-group {
