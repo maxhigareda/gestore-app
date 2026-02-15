@@ -44,8 +44,18 @@ const CreateCollaborator: React.FC = () => {
         regimeType: '',
         workLocation: '',
         patronalRegistration: '',
-        contractType: ''
+        contractType: '',
+
+        // New Fields (Req 2021)
+        workShift: '', // Diurna, Nocturna, Mixta
+        workSchedule: '', // Text input for now
+        workDays: [] as string[], // Multi-select
+        salary: '',
+        compensationType: '' // Fijo, Mixto, Variable
     });
+
+    const [csvPreview, setCsvPreview] = useState<any[] | null>(null);
+    const [showCsvModal, setShowCsvModal] = useState(false);
 
     useEffect(() => {
         fetchCollaborators();
@@ -65,6 +75,17 @@ const CreateCollaborator: React.FC = () => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleWorkDaysChange = (day: string) => {
+        setFormData(prev => {
+            const currentDays = prev.workDays || [];
+            if (currentDays.includes(day)) {
+                return { ...prev, workDays: currentDays.filter(d => d !== day) };
+            } else {
+                return { ...prev, workDays: [...currentDays, day] };
+            }
+        });
     };
 
     const downloadTemplate = () => {
@@ -102,11 +123,48 @@ const CreateCollaborator: React.FC = () => {
         document.getElementById('csvInput')?.click();
     };
 
-    const processCSV = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            alert("Funcionalidad de Carga Masiva (CSV) simulada: Archivo seleccionado. Se esperan encabezados en español.");
-            // Here we would call parseCSV and loop through inserts
-        }
+    const processCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const text = event.target?.result as string;
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+            if (lines.length < 2) {
+                alert("El archivo CSV parece estar vacío o sin datos.");
+                return;
+            }
+
+            const headers = lines[0].split(',').map(h => h.trim());
+
+            const rows = lines.slice(1).map((line, index) => {
+                const values = line.split(',');
+                const rowData: any = { id: index };
+                headers.forEach((h, i) => {
+                    rowData[h] = values[i]?.trim();
+                });
+
+                // Simple Validation logic
+                const required = ['Nombre', 'Apellido Paterno', 'Email Corporativo', 'Fecha Ingreso'];
+                const missing = required.filter(f => !rowData[f]);
+                rowData.isValid = missing.length === 0;
+                rowData.errors = missing;
+
+                return rowData;
+            });
+
+            setCsvPreview(rows);
+            setShowCsvModal(true);
+        };
+        reader.readAsText(file);
+    };
+
+    const confirmBulkImport = async () => {
+        // Logic to insert valid rows would go here
+        alert(`Procesando ${csvPreview?.filter(r => r.isValid).length} registros válidos... (Simulación)`);
+        setShowCsvModal(false);
+        setCsvPreview(null);
     };
 
     const [loading, setLoading] = useState(false);
@@ -217,6 +275,13 @@ const CreateCollaborator: React.FC = () => {
                 patronal_registration: formData.patronalRegistration,
                 contract_type: formData.contractType,
 
+                // New Fields Extended
+                work_shift: formData.workShift,
+                work_schedule: formData.workSchedule,
+                work_days: formData.workDays,
+                salary: formData.salary ? parseFloat(formData.salary) : null,
+                compensation_type: formData.compensationType,
+
                 updated_at: new Date()
             };
 
@@ -282,7 +347,12 @@ const CreateCollaborator: React.FC = () => {
                 regimeType: '',
                 workLocation: '',
                 patronalRegistration: '',
-                contractType: ''
+                contractType: '',
+                workShift: '',
+                workSchedule: '',
+                workDays: [],
+                salary: '',
+                compensationType: ''
             });
             setStep(1);
             setPhotoFile(null);
