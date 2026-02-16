@@ -72,28 +72,50 @@ const FichaPage: React.FC = () => {
 
                 // Map DB to UserProfile
                 const mappedProfile: UserProfile = {
-                    photoUrl: data.photo_url || user.photoUrl || '', // TODO: Storage
+                    photoUrl: data.photo_url || user.photoUrl || '',
                     firstName: data.first_name || '',
                     lastName: data.last_name || '',
                     role: data.job_title || '',
                     rfc: data.rfc || '',
                     email: data.email || user.email || '',
-                    birthDate: data.birth_date || '', // date string
+                    birthDate: data.birth_date || '',
                     address: data.address || '',
-                    dateOfEntry: data.date_of_entry || '', // "Fecha Ingreso Grupo"
 
+                    // Contact & Personal
+                    phoneOffice: data.phone || data.phone_office || '',
+                    phonePersonal: data.phone_personal || '',
+                    emailPersonal: data.email_personal || '',
+                    maritalStatus: data.marital_status || '',
+                    birthCountry: data.birth_country || 'México',
+                    documentType: data.document_type || 'RFC',
+                    curp: data.curp || '',
+                    nss: data.nss || '',
+                    emergencyName: data.emergency_contact_name || '',
+                    emergencyPhone: data.emergency_contact_phone || '',
+
+                    // Work Info
                     area: data.department || '',
                     division: data.division || '',
-                    company: data.company || '',
+                    company: data.company || 'The Store Intelligence',
                     costCenter: data.cost_center || '',
-                    supervisor: data.supervisor || '',
+                    supervisor: data.manager_id || '', // Note: DB likely uses manager_id, UI uses supervisor
                     team: data.team || '',
-                    substitute: data.substitute || '',
+                    substitute: data.substitute_id || '',
                     regimeType: data.regime_type || '',
                     workLocation: data.work_location || '',
                     patronalRegistration: data.patronal_registration || '',
                     contractType: data.contract_type || '',
-                    companyEntryDate: data.company_entry_date || '', // "Fecha Ingreso Compañía"
+                    paymentMethod: data.payment_method || '',
+
+                    companyEntryDate: data.company_entry_date || '',
+                    dateOfEntry: data.date_of_entry || '',
+
+                    // Advanced / New Fields
+                    salary: data.salary ? Number(data.salary) : undefined,
+                    shift: data.work_shift || '',
+                    schedule: data.work_schedule || '',
+                    workDays: data.work_days || [],
+                    compensationType: data.compensation_type || '',
 
                     vacationBalance: 0
                 };

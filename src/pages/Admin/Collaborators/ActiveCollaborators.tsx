@@ -146,11 +146,19 @@ const ActiveCollaborators: React.FC = () => {
                                 collaborators.map((col) => (
                                     <tr key={col.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                                         <td style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                            <img
-                                                src={col.photo_url || col.avatar_url || 'https://via.placeholder.com/40'}
-                                                alt={col.first_name}
-                                                style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
-                                            />
+                                            <div style={{ width: 40, height: 40, borderRadius: '50%', overflow: 'hidden', flexShrink: 0, backgroundColor: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                {col.photo_url || col.avatar_url ? (
+                                                    <img
+                                                        src={col.photo_url || col.avatar_url}
+                                                        alt={col.first_name}
+                                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                    />
+                                                ) : (
+                                                    <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#666' }}>
+                                                        {col.first_name?.charAt(0)}{col.last_name?.charAt(0)}
+                                                    </span>
+                                                )}
+                                            </div>
                                             <div>
                                                 <div style={{ fontWeight: 500 }}>{col.first_name} {col.last_name}</div>
                                                 <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>{col.email}</div>
