@@ -241,30 +241,50 @@ const ActiveCollaborators: React.FC = () => {
                 <EditProfileModal
                     userId={editingUser.id}
                     user={{
+                        // Personal
                         firstName: editingUser.first_name,
                         lastName: editingUser.last_name,
                         email: editingUser.email,
-                        role: editingUser.job_title,
-                        area: editingUser.department,
                         photoUrl: editingUser.photo_url,
                         rfc: editingUser.rfc || '',
+                        curp: (editingUser as any).curp || '',
+                        nss: (editingUser as any).nss || '',
+                        birthDate: (editingUser as any).birth_date || '',
+                        birthCountry: (editingUser as any).birth_country || 'México',
+                        maritalStatus: (editingUser as any).marital_status || '',
+                        documentType: (editingUser as any).document_type || 'RFC',
+                        address: (editingUser as any).address || '',
+                        phoneOffice: (editingUser as any).phone_office || '',
+                        phonePersonal: (editingUser as any).phone_personal || '',
+                        emailPersonal: (editingUser as any).email_personal || '',
+                        emergencyName: (editingUser as any).emergency_contact_name || '',
+                        emergencyPhone: (editingUser as any).emergency_contact_phone || '',
+
+                        // Job / Work
+                        role: editingUser.job_title,
+                        area: editingUser.department,
+                        division: (editingUser as any).division || '',
+                        company: (editingUser as any).company || 'The Store Intelligence',
+                        costCenter: (editingUser as any).cost_center || '',
+                        supervisor: (editingUser as any).manager_id || '',
+                        team: (editingUser as any).team || '',
+                        substitute: (editingUser as any).substitute_id || '',
+                        regimeType: (editingUser as any).regime_type || '',
+                        workLocation: (editingUser as any).work_location || '',
+                        patronalRegistration: (editingUser as any).patronal_registration || '',
+                        contractType: (editingUser as any).contract_type || '',
                         companyEntryDate: editingUser.company_entry_date || '',
-                        // Defaults for potentially missing fields until we specificly select them
-                        address: '',
-                        birthDate: '',
-                        dateOfEntry: '',
-                        division: '',
-                        company: '',
-                        costCenter: '',
-                        supervisor: '',
-                        team: '',
-                        substitute: '',
-                        regimeType: '',
-                        workLocation: '',
-                        patronalRegistration: '',
-                        contractType: '',
+                        dateOfEntry: (editingUser as any).date_of_entry || '',
+                        paymentMethod: (editingUser as any).payment_method || '',
+
+                        // Advanced / New Fields
+                        salary: (editingUser as any).salary ? Number((editingUser as any).salary) : undefined,
+                        shift: (editingUser as any).work_shift || '',
+                        schedule: (editingUser as any).work_schedule || '',
+                        workDays: (editingUser as any).work_days || [],
+                        compensationType: (editingUser as any).compensation_type || '',
+
                         vacationBalance: 0,
-                        ...(editingUser as any) // Spread the rest if they match
                     }}
                     onClose={() => setIsEditModalOpen(false)}
                     onSave={handleSaveEdit}
