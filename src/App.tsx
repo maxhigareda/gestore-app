@@ -18,6 +18,7 @@ import AdminPage from './pages/Admin';
 import CollaboratorsPage from './pages/Admin/Collaborators';
 import CreateCollaborator from './pages/Admin/Collaborators/CreateCollaborator';
 import ActiveCollaborators from './pages/Admin/Collaborators/ActiveCollaborators';
+import RequestsPage from './pages/Admin/Collaborators/Requests';
 import OrganizationPage from './pages/Admin/Organization';
 import AttendancePage from './pages/Admin/Attendance';
 
@@ -70,7 +71,7 @@ function App() {
                 <Route path="admin/collaborators/create" element={<CreateCollaborator />} />
                 <Route path="admin/collaborators/active" element={<ActiveCollaborators />} />
                 <Route path="admin/collaborators/groups" element={<PlaceholderPage title="Grupos de Colaboradores (En construcción)" />} />
-                <Route path="admin/collaborators/requests" element={<PlaceholderPage title="Solicitudes (En construcción)" />} />
+                <Route path="admin/collaborators/requests" element={<RequestsPage />} />
 
                 <Route path="admin/organization" element={<OrganizationPage />} />
                 <Route path="admin/attendance" element={<AttendancePage />} />
