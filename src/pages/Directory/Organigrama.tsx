@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
-import { User, ChevronDown, ChevronRight, Users } from 'lucide-react';
+import { ChevronDown, ChevronRight, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Types
@@ -105,7 +105,9 @@ const OrgNode: React.FC<{
                     {(profile.photo_url || profile.avatar_url) ? (
                         <img src={profile.photo_url || profile.avatar_url || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
-                        <User size={24} color="#888" />
+                        <span style={{ fontSize: '1.2rem', fontWeight: 600, color: '#666' }}>
+                            {profile.first_name?.charAt(0)}{profile.last_name?.charAt(0)}
+                        </span>
                     )}
                 </div>
 

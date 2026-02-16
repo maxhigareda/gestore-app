@@ -67,7 +67,7 @@ const Login: React.FC = () => {
                 textAlign: 'center'
             }}>
                 <div style={{ marginBottom: '2rem' }}>
-                    <img src="/assets/GeStore.png" alt="GeStore" style={{ height: '60px', marginBottom: '1rem' }} />
+                    <img src="/asset/logo_gestore_v2.png" alt="GeStore" style={{ height: '60px', marginBottom: '1rem' }} />
                     <h1 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Bienvenido</h1>
                     <p style={{ color: 'var(--color-text-muted)' }}>Inicia sesión en GeStore</p>
                 </div>

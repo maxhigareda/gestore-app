@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { useAuth } from '../../context/AuthContext';
-import { Search, User, Phone, Mail, DollarSign, Calendar } from 'lucide-react';
+import { Search, Phone, Mail, DollarSign, Calendar } from 'lucide-react';
 
 const MyTeamPage: React.FC = () => {
     const { user } = useAuth();
@@ -111,7 +111,9 @@ const MyTeamPage: React.FC = () => {
                                             {member.photo_url ? (
                                                 <img src={member.photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                             ) : (
-                                                <User size={20} color="#666" />
+                                                <span style={{ fontSize: '1rem', fontWeight: 600, color: '#666' }}>
+                                                    {member.first_name?.charAt(0)}{member.last_name?.charAt(0)}
+                                                </span>
                                             )}
                                         </div>
                                         <div>

@@ -118,11 +118,22 @@ const DirectoryPage: React.FC = () => {
                             filteredProfiles.map(profile => (
                                 <tr key={profile.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                                     <td style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                        <img
-                                            src={profile.photo_url || profile.avatar_url || 'https://via.placeholder.com/40'}
-                                            alt={profile.full_name}
-                                            style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
-                                        />
+                                        <div style={{
+                                            width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden',
+                                            backgroundColor: '#e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                        }}>
+                                            {profile.photo_url || profile.avatar_url ? (
+                                                <img
+                                                    src={profile.photo_url || profile.avatar_url || ''}
+                                                    alt={profile.full_name}
+                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                />
+                                            ) : (
+                                                <span style={{ fontSize: '1rem', fontWeight: 600, color: '#666' }}>
+                                                    {profile.first_name?.charAt(0)}{profile.last_name?.charAt(0)}
+                                                </span>
+                                            )}
+                                        </div>
                                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                                             <span style={{ fontWeight: 500 }}>{profile.first_name} {profile.last_name}</span>
                                             <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>{profile.email}</span>
