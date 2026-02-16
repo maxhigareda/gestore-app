@@ -14,6 +14,7 @@ interface Profile {
     department: string;
     supervisor: string;
     company_entry_date: string;
+    phone_personal?: string;
 }
 
 const DirectoryPage: React.FC = () => {
@@ -97,6 +98,9 @@ const DirectoryPage: React.FC = () => {
                             <th style={{ padding: '1rem', fontWeight: 600 }}>Colaborador</th>
                             <th style={{ padding: '1rem', fontWeight: 600 }}>Rol</th>
                             <th style={{ padding: '1rem', fontWeight: 600 }}>Área</th>
+                            <th style={{ padding: '1rem', fontWeight: 600 }}>Email Corp.</th>
+                            <th style={{ padding: '1rem', fontWeight: 600 }}>Tel. Personal</th>
+                            <th style={{ padding: '1rem', fontWeight: 600 }}>Ext.</th>
                             <th style={{ padding: '1rem', fontWeight: 600 }}>Supervisor</th>
                             <th style={{ padding: '1rem', fontWeight: 600 }}>Fecha Ingreso</th>
                         </tr>
@@ -152,6 +156,9 @@ const DirectoryPage: React.FC = () => {
                                         </span>
                                     </td>
                                     <td style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>{profile.department || 'N/A'}</td>
+                                    <td style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>{profile.email || 'N/A'}</td>
+                                    <td style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>{profile.phone_personal || 'N/A'}</td>
+                                    <td style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>N/A</td>
                                     <td style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>{profile.supervisor || 'N/A'}</td>
                                     <td style={{ padding: '1rem', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
                                         {profile.company_entry_date ? new Date(profile.company_entry_date).toLocaleDateString() : 'N/A'}

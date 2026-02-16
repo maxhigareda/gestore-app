@@ -55,7 +55,7 @@ const SecondarySidebar: React.FC = () => {
                 }}>
                     {!user?.photoUrl && (user?.firstName?.charAt(0) || 'U')}
                 </div>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.1rem', fontWeight: 600 }}>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.1rem', fontWeight: 300 }}>
                     ¡Hola!
                 </h3>
                 <h3 style={{ fontSize: '1.1rem', marginBottom: '0.1rem', fontWeight: 500 }}>
