@@ -24,6 +24,13 @@ export interface UserProfile {
     contractType: string;
     companyEntryDate: string; // 'Fecha de Ingreso Compañía'
     vacationBalance: number;
+
+    // New Fields (Advanced)
+    salary?: number;
+    shift?: string;
+    schedule?: string;
+    workDays?: string[];
+    compensationType?: string;
 }
 
 export const MOCK_USER_PROFILE: UserProfile = {

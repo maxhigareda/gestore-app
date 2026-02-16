@@ -36,7 +36,6 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
                 address: formData.address,
 
                 // Correctly map both date fields
-                date_of_entry: sanitizeDate(formData.dateOfEntry),       // Fecha Ingreso Grupo
                 company_entry_date: sanitizeDate(formData.companyEntryDate), // Fecha Ingreso Compañía
 
                 department: formData.area, // Mapping 'area' to department
@@ -50,6 +49,13 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
                 work_location: formData.workLocation,
                 patronal_registration: formData.patronalRegistration,
                 contract_type: formData.contractType,
+
+                // New Fields Mapped
+                salary: formData.salary,
+                work_shift: formData.shift,
+                work_schedule: formData.schedule,
+                work_days: formData.workDays,
+                compensation_type: formData.compensationType,
 
                 updated_at: new Date().toISOString()
             };
@@ -157,6 +163,32 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
                                 <Field label="Tipo de Contrato" value={formData.contractType} onChange={v => handleChange('contractType', v)} />
                                 <Field label="Fecha Ingreso Compañía" value={formData.companyEntryDate} type="date" onChange={v => handleChange('companyEntryDate', v)} />
                                 <Field label="Fecha de Ingreso (Grupo)" value={formData.dateOfEntry} type="date" onChange={v => handleChange('dateOfEntry', v)} />
+
+                                {/* New Fields */}
+                                <Field label="Sueldo Base" value={String(formData.salary || '')} type="number" onChange={v => handleChange('salary', v ? parseFloat(v) : 0)} />
+                                <Field label="Tipo de Compensación" value={formData.compensationType || ''} onChange={v => handleChange('compensationType', v)} />
+                                <Field label="Turno" value={formData.shift || ''} onChange={v => handleChange('shift', v)} />
+                                <Field label="Horario" value={formData.schedule || ''} onChange={v => handleChange('schedule', v)} />
+                                <div style={{ gridColumn: '1 / -1' }}>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--color-text-secondary)', fontWeight: 500 }}>
+                                        Días Laborales
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={Array.isArray(formData.workDays) ? formData.workDays.join(', ') : formData.workDays || ''}
+                                        onChange={e => handleChange('workDays', e.target.value.split(',').map(s => s.trim()))}
+                                        placeholder="Lunes, Martes, Miércoles..."
+                                        style={{
+                                            width: '100%',
+                                            padding: '10px',
+                                            borderRadius: '6px',
+                                            border: '1px solid var(--border-color)',
+                                            backgroundColor: 'var(--color-surface)',
+                                            color: 'var(--color-text-primary)'
+                                        }}
+                                    />
+                                    <small style={{ color: 'var(--color-text-muted)' }}>Separar por comas (ej. Lunes, Martes)</small>
+                                </div>
                             </>
                         )}
 
