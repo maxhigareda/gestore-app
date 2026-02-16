@@ -218,7 +218,7 @@ const SecondarySidebar: React.FC = () => {
                 borderBottom: '1px solid var(--border-color)'
             }}>
                 {/* Placeholder Logo */}
-                <img src="/assets/GeStore.png" alt="GeStore" style={{ maxHeight: '35px', maxWidth: '100%', objectFit: 'contain' }} />
+                <img src="/assets/logo_gestore_v2.png" alt="GeStore" style={{ height: '40px', maxWidth: '100%', objectFit: 'contain' }} />
             </div>
 
             <div style={{ flex: 1, overflowY: 'auto' }}>
