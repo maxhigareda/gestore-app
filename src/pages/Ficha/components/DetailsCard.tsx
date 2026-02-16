@@ -3,12 +3,14 @@ import { type UserProfile } from '../../../utils/mockData';
 import ResumenTab from '../tabs/ResumenTab';
 import VacacionesTab from '../tabs/VacacionesTab';
 import PermisosTab from '../tabs/PermisosTab';
+import HistoriaTab from '../tabs/HistoriaTab'; // Import HistoriaTab
 
 interface DetailsCardProps {
     user: UserProfile;
 }
 
-const TABS = ['Resumen', 'Documentos', 'Historia', 'Bitácora', 'Asistencia', 'Vacaciones', 'Permisos'];
+// Hidden: 'Documentos', 'Bitácora', 'Asistencia' (for now)
+const TABS = ['Resumen', 'Historia', 'Vacaciones', 'Permisos'];
 
 const DetailsCard: React.FC<DetailsCardProps> = ({ user }) => {
     const [activeTab, setActiveTab] = useState('Resumen');
@@ -17,6 +19,8 @@ const DetailsCard: React.FC<DetailsCardProps> = ({ user }) => {
         switch (activeTab) {
             case 'Resumen':
                 return <ResumenTab user={user} />;
+            case 'Historia':
+                return <HistoriaTab />;
             case 'Vacaciones':
                 return <VacacionesTab />;
             case 'Permisos':

@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import MainLayout from './layouts/MainLayout';
 import PlaceholderPage from './components/PlaceholderPage';
 import FichaPage from './pages/Ficha';
+import MyTeamPage from './pages/MyTeam'; // Import MyTeamPage
 import EvaluationsPage from './pages/Evaluations';
 import PortalPage from './pages/Portal';
 import DirectoryPage from './pages/Directory';
@@ -52,7 +53,7 @@ function App() {
                 <Route path="ficha" element={<FichaPage />} />
 
                 {/* Team & Directory */}
-                <Route path="team" element={<PlaceholderPage title="Mi Equipo" />} />
+                <Route path="team" element={<MyTeamPage />} />
                 <Route path="directory" element={<DirectoryPage />} />
                 <Route path="org-chart" element={<OrganigramaPage />} />
 
