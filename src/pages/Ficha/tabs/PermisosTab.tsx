@@ -3,6 +3,7 @@ import { Edit2, Trash2, Eye } from 'lucide-react';
 import { supabase } from '../../../lib/supabaseClient';
 import { useAuth } from '../../../context/AuthContext';
 import PermissionRequestModal from '../../Portal/components/PermissionRequestModal';
+import ConfirmationModal from '../../../components/ConfirmationModal';
 
 // Define Interface locally or import if shared (currently local in modal, let's look at standardizing later)
 // For now, mirroring the DB structure
@@ -63,10 +64,18 @@ const PermisosTab: React.FC = () => {
         }
     };
 
-    const handleDelete = async (id: string) => {
-        const confirm = window.confirm('¿Seguro que deseas eliminar este permiso?');
-        if (!confirm) return;
+    // Confirmation Modal State
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [confirmAction, setConfirmAction] = useState<() => void>(() => { });
+    const [confirmMessage, setConfirmMessage] = useState('');
 
+    const handleDeleteClick = (id: string) => {
+        setConfirmMessage('¿Seguro que deseas eliminar este permiso?');
+        setConfirmAction(() => () => handleDelete(id));
+        setConfirmOpen(true);
+    };
+
+    const handleDelete = async (id: string) => {
         const { error } = await supabase.from('permission_requests').delete().eq('id', id);
         if (error) {
             alert('Error al borrar');
@@ -134,7 +143,7 @@ const PermisosTab: React.FC = () => {
                                     <td style={tdStyle}>
                                         <div style={{ display: 'flex', gap: '8px' }}>
                                             <ActionIcon icon={<Edit2 size={16} />} title="Editar" onClick={() => handleEdit(request)} />
-                                            <ActionIcon icon={<Trash2 size={16} />} title="Borrar" onClick={() => handleDelete(request.id)} />
+                                            <ActionIcon icon={<Trash2 size={16} />} title="Borrar" onClick={() => handleDeleteClick(request.id)} />
                                             <ActionIcon icon={<Eye size={16} />} title="Ver" onClick={() => handleView(request)} />
                                         </div>
                                     </td>
@@ -187,6 +196,14 @@ const PermisosTab: React.FC = () => {
                     </div>
                 </div>
             )}
+
+            <ConfirmationModal
+                isOpen={confirmOpen}
+                onClose={() => setConfirmOpen(false)}
+                onConfirm={confirmAction}
+                title="Confirmar Acción"
+                message={confirmMessage}
+            />
         </div>
     );
 };

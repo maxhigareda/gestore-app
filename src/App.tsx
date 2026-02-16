@@ -11,6 +11,7 @@ import FichaPage from './pages/Ficha';
 import MyTeamPage from './pages/MyTeam'; // Import MyTeamPage
 import EvaluationsPage from './pages/Evaluations';
 import PortalPage from './pages/Portal';
+import TrainingPage from './pages/Training'; // Import TrainingPage
 import DirectoryPage from './pages/Directory';
 import OrganigramaPage from './pages/Directory/Organigrama';
 import AdminPage from './pages/Admin';
@@ -60,7 +61,7 @@ function App() {
                 {/* Growth & Feedback */}
                 <Route path="evaluations" element={<EvaluationsPage />} />
                 <Route path="surveys" element={<PlaceholderPage title="Mis Encuestas" />} />
-                <Route path="training-my" element={<h1 style={{ padding: '2rem' }}>Mis Capacitaciones (En construcción)</h1>} />
+                <Route path="training-my" element={<TrainingPage />} />
                 <Route path="recognition" element={<PlaceholderPage title="Reconocimientos" />} />
 
                 {/* Admin Module Routes */}

@@ -9,6 +9,7 @@ import {
     type VacationRequest
 } from '../../../utils/vacationLogic';
 import VacationRequestModal from '../../Portal/components/VacationRequestModal';
+import ConfirmationModal from '../../../components/ConfirmationModal';
 
 // Use this for the "Requests" table to keep it dummy/clean for now but wired to real types
 // User wants "buttons to work" even if data is dummy?
@@ -78,14 +79,22 @@ const VacacionesTab: React.FC = () => {
         }
     };
 
-    const handleDelete = async (id: string) => {
-        const confirm = window.confirm('¿Seguro que deseas eliminar esta solicitud?');
-        if (!confirm) return;
+    // Confirmation Modal State
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [confirmAction, setConfirmAction] = useState<() => void>(() => { });
+    const [confirmMessage, setConfirmMessage] = useState('');
 
+    const handleDeleteClick = (id: string) => {
+        setConfirmMessage('¿Seguro que deseas eliminar esta solicitud?');
+        setConfirmAction(() => () => handleDelete(id));
+        setConfirmOpen(true);
+    };
+
+    const handleDelete = async (id: string) => {
         const { error } = await supabase.from('vacation_requests').delete().eq('id', id);
         if (error) {
             console.error('Error erasing vacation request:', error);
-            alert(`Error al borrar: ${error.message}`);
+            // Could use a toast here
         } else {
             fetchVacationData();
         }
