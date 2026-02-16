@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Edit2 } from 'lucide-react';
+import EditProfileModal from '../../Ficha/components/EditProfileModal';
 
 interface Collaborator {
     id: string;
@@ -25,6 +26,10 @@ const ActiveCollaborators: React.FC = () => {
     const [totalCount, setTotalCount] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
 
+    // State for editing
+    const [editingUser, setEditingUser] = useState<Collaborator | null>(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
     useEffect(() => {
         fetchCollaborators();
     }, [page, searchTerm]);
@@ -39,7 +44,6 @@ const ActiveCollaborators: React.FC = () => {
             let query = supabase
                 .from('profiles')
                 .select('*', { count: 'exact' })
-                // Filter by active role if needed, currently assuming all profiles are collaborators + admins
                 .order('first_name', { ascending: true })
                 .range(from, to);
 
@@ -54,7 +58,6 @@ const ActiveCollaborators: React.FC = () => {
                 throw error;
             }
 
-            console.log('Collaborators found:', data?.length); // Debug info
             setCollaborators(data || []);
             setTotalCount(count || 0);
 
@@ -70,6 +73,17 @@ const ActiveCollaborators: React.FC = () => {
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
         setPage(0); // Reset to first page on search
+    };
+
+    const handleEditClick = (collab: Collaborator) => {
+        setEditingUser(collab);
+        setIsEditModalOpen(true);
+    };
+
+    const handleSaveEdit = () => {
+        fetchCollaborators(); // Refresh list
+        setIsEditModalOpen(false);
+        setEditingUser(null);
     };
 
     return (
@@ -116,16 +130,17 @@ const ActiveCollaborators: React.FC = () => {
                                 <th style={{ padding: '1rem' }}>Cargo</th>
                                 <th style={{ padding: '1rem' }}>Área</th>
                                 <th style={{ padding: '1rem' }}>Fecha Ingreso</th>
+                                <th style={{ padding: '1rem', textAlign: 'center' }}>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td colSpan={5} style={{ padding: '2rem', textAlign: 'center' }}>Cargando...</td>
+                                    <td colSpan={6} style={{ padding: '2rem', textAlign: 'center' }}>Cargando...</td>
                                 </tr>
                             ) : collaborators.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} style={{ padding: '2rem', textAlign: 'center' }}>No se encontraron colaboradores.</td>
+                                    <td colSpan={6} style={{ padding: '2rem', textAlign: 'center' }}>No se encontraron colaboradores.</td>
                                 </tr>
                             ) : (
                                 collaborators.map((col) => (
@@ -149,6 +164,24 @@ const ActiveCollaborators: React.FC = () => {
                                         <td style={{ padding: '1rem' }}>{col.department || 'N/A'}</td>
                                         <td style={{ padding: '1rem' }}>
                                             {col.company_entry_date ? new Date(col.company_entry_date).toLocaleDateString() : 'N/A'}
+                                        </td>
+                                        <td style={{ padding: '1rem', textAlign: 'center' }}>
+                                            <button
+                                                onClick={() => handleEditClick(col)}
+                                                style={{
+                                                    padding: '8px',
+                                                    cursor: 'pointer',
+                                                    background: 'none',
+                                                    border: 'none',
+                                                    color: 'var(--color-text-secondary)',
+                                                    transition: 'color 0.2s'
+                                                }}
+                                                onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-primary)'}
+                                                onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-secondary)'}
+                                                title="Editar"
+                                            >
+                                                <Edit2 size={18} />
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
@@ -202,6 +235,41 @@ const ActiveCollaborators: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Edit Modal */}
+            {isEditModalOpen && editingUser && (
+                <EditProfileModal
+                    userId={editingUser.id}
+                    user={{
+                        firstName: editingUser.first_name,
+                        lastName: editingUser.last_name,
+                        email: editingUser.email,
+                        role: editingUser.job_title,
+                        area: editingUser.department,
+                        photoUrl: editingUser.photo_url,
+                        rfc: editingUser.rfc || '',
+                        companyEntryDate: editingUser.company_entry_date || '',
+                        // Defaults for potentially missing fields until we specificly select them
+                        address: '',
+                        birthDate: '',
+                        dateOfEntry: '',
+                        division: '',
+                        company: '',
+                        costCenter: '',
+                        supervisor: '',
+                        team: '',
+                        substitute: '',
+                        regimeType: '',
+                        workLocation: '',
+                        patronalRegistration: '',
+                        contractType: '',
+                        vacationBalance: 0,
+                        ...(editingUser as any) // Spread the rest if they match
+                    }}
+                    onClose={() => setIsEditModalOpen(false)}
+                    onSave={handleSaveEdit}
+                />
+            )}
         </div>
     );
 };

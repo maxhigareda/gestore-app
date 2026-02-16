@@ -15,7 +15,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
     const [saving, setSaving] = useState(false);
     const [activeTab, setActiveTab] = useState<'personal' | 'job'>('personal');
 
-    const handleChange = (field: keyof UserProfile, value: string) => {
+    const handleChange = (field: keyof UserProfile, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
