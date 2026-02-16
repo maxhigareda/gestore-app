@@ -15,9 +15,43 @@ const formatDate = (dateStr?: string) => {
     return dateStr;
 };
 
+const calculateTenure = (dateString?: string) => {
+    if (!dateString) return '';
+    // If it's undefined/null, handle gracefully
+
+    const start = new Date(dateString);
+    if (isNaN(start.getTime())) return '';
+
+    const now = new Date();
+    let years = now.getFullYear() - start.getFullYear();
+    let months = now.getMonth() - start.getMonth();
+
+    if (months < 0) {
+        years--;
+        months += 12;
+    }
+
+    // Adjust if day of month hasn't occurred yet
+    if (now.getDate() < start.getDate()) {
+        months--;
+        if (months < 0) {
+            years--;
+            months += 12;
+        }
+    }
+
+    const parts = [];
+    if (years > 0) parts.push(`${years} ${years === 1 ? 'año' : 'años'}`);
+    if (months > 0) parts.push(`${months} ${months === 1 ? 'mes' : 'meses'}`);
+
+    if (parts.length === 0) return '(Menos de 1 mes)';
+    return `(${parts.join(', ')})`;
+};
+
 const PersonalInfoCard: React.FC<PersonalInfoCardProps> = ({ user, onEdit }) => {
     const age = calculateAge(user.birthDate);
     const initials = user.firstName.charAt(0) + user.lastName.charAt(0);
+    const tenure = calculateTenure(user.dateOfEntry);
 
     return (
         <div style={{
@@ -96,7 +130,7 @@ const PersonalInfoCard: React.FC<PersonalInfoCardProps> = ({ user, onEdit }) => 
                 <InfoRow label="Correo Corporativo" value={user.email} />
                 <InfoRow label="Cumpleaños" value={`${formatDate(user.birthDate)} (${age} años)`} />
                 <InfoRow label="Dirección" value={user.address} />
-                <InfoRow label="Fecha de Ingreso" value={formatDate(user.dateOfEntry)} />
+                <InfoRow label="Fecha de Ingreso" value={`${formatDate(user.dateOfEntry)} ${tenure}`} />
             </div>
         </div>
     );
