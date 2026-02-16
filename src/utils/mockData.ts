@@ -25,6 +25,19 @@ export interface UserProfile {
     companyEntryDate: string; // 'Fecha de Ingreso Compañía'
     vacationBalance: number;
 
+    // Contact & Extended Personal
+    phoneOffice?: string;
+    phonePersonal?: string;
+    emailPersonal?: string;
+    maritalStatus?: string;
+    birthCountry?: string; // 'México' or 'Otro'
+    documentType?: string; // RFC vs Other
+    curp?: string;
+    nss?: string;
+    paymentMethod?: string;
+    emergencyName?: string;
+    emergencyPhone?: string;
+
     // New Fields (Advanced)
     salary?: number;
     shift?: string;
