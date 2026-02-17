@@ -29,7 +29,7 @@ const CreateRoleModal: React.FC<CreateRoleModalProps> = ({ onClose, onSuccess, r
 
     const fetchAreas = async () => {
         // Fetch distinct departments from job_titles
-        const { data, error } = await supabase
+        const { data } = await supabase
             .from('job_titles')
             .select('department')
             .order('department', { ascending: true });
