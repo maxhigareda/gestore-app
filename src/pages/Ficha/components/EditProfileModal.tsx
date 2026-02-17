@@ -47,8 +47,8 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
                 setAvailableAreas(areas as string[]);
 
                 // Initial Filter if user has area
-                if (user.department) {
-                    const rolesInArea = rolesData.filter((r: any) => r.department === user.department);
+                if (user.area) {
+                    const rolesInArea = rolesData.filter((r: any) => r.department === user.area);
                     setFilteredRoles(rolesInArea);
                 } else if (user.company) {
                     // Fallback or just Empty
@@ -239,7 +239,6 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
                                     <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--color-text-secondary)', fontWeight: 500 }}>País de Nacimiento</label>
                                     <select
                                         value={formData.birthCountry}
-                                        onChange={e => handleChange('birthCountry', e.target.value)}
                                         onChange={e => handleChange('birthCountry', e.target.value)}
                                         className="input-field"
                                     >

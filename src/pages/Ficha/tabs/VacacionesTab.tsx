@@ -168,7 +168,7 @@ const VacacionesTab: React.FC = () => {
                                     <td style={tdStyle}>
                                         <div style={{ display: 'flex', gap: '8px' }}>
                                             <ActionIcon icon={<Edit2 size={16} />} title="Editar" onClick={() => handleEdit(request)} />
-                                            <ActionIcon icon={<Trash2 size={16} />} title="Borrar" onClick={() => handleDelete(request.id)} />
+                                            <ActionIcon icon={<Trash2 size={16} />} title="Borrar" onClick={() => handleDeleteClick(request.id)} />
                                             <ActionIcon icon={<Eye size={16} />} title="Ver" onClick={() => handleView(request)} />
                                         </div>
                                     </td>
@@ -253,6 +253,16 @@ const VacacionesTab: React.FC = () => {
                     </div>
                 </div>
             )}
+
+            <ConfirmationModal
+                isOpen={confirmOpen}
+                onClose={() => setConfirmOpen(false)}
+                onConfirm={confirmAction}
+                title="Confirmar Acción"
+                message={confirmMessage}
+                type="danger"
+                confirmText="Confirmar"
+            />
         </div>
     );
 };

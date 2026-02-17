@@ -55,7 +55,7 @@ const CreateRoleModal: React.FC<CreateRoleModalProps> = ({ onClose, onSuccess, r
         try {
             if (roleToEdit) {
                 // UPDATE
-                const { error } = await supabase
+                const { error: updateError } = await supabase
                     .from('job_titles')
                     .update({
                         name: roleName,
@@ -64,10 +64,10 @@ const CreateRoleModal: React.FC<CreateRoleModalProps> = ({ onClose, onSuccess, r
                     })
                     .eq('id', roleToEdit.id);
 
-                if (error) throw error;
+                if (updateError) throw updateError;
             } else {
                 // INSERT
-                const { error } = await supabase
+                const { error: insertError } = await supabase
                     .from('job_titles')
                     .insert({
                         id: generatedId,
@@ -76,12 +76,12 @@ const CreateRoleModal: React.FC<CreateRoleModalProps> = ({ onClose, onSuccess, r
                         company: 'The Store Intelligence'
                     });
 
-                if (error) throw error;
+                if (insertError) throw insertError;
             }
             onSuccess();
-        } catch (error) {
-            console.error('Error saving role:', error);
-            alert('Error al guardar el cargo.');
+        } catch {
+            console.error('Error in operation');
+            alert('Ocurrió un error. Intenta de nuevo.');
         } finally {
             setLoading(false);
         }
