@@ -87,7 +87,7 @@ const CreateRoleModal: React.FC<CreateRoleModalProps> = ({ onClose, onSuccess })
                         <select
                             value={selectedArea}
                             onChange={(e) => setSelectedArea(e.target.value)}
-                            style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)', backgroundColor: 'var(--color-background)', color: 'var(--color-text-primary)' }}
+                            className="input-field"
                             required
                         >
                             <option value="">Selecciona un área...</option>
@@ -107,7 +107,7 @@ const CreateRoleModal: React.FC<CreateRoleModalProps> = ({ onClose, onSuccess })
                                 value={newAreaName}
                                 onChange={(e) => setNewAreaName(e.target.value)}
                                 placeholder="Ej. Recursos Humanos"
-                                style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)', backgroundColor: 'var(--color-background)', color: 'var(--color-text-primary)' }}
+                                className="input-field"
                                 required={selectedArea === 'new_area'}
                             />
                         </div>
@@ -121,7 +121,7 @@ const CreateRoleModal: React.FC<CreateRoleModalProps> = ({ onClose, onSuccess })
                             value={roleName}
                             onChange={(e) => setRoleName(e.target.value)}
                             placeholder="Ej. Gerente de Ventas"
-                            style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)', backgroundColor: 'var(--color-background)', color: 'var(--color-text-primary)' }}
+                            className="input-field"
                             required
                         />
                     </div>
@@ -133,7 +133,8 @@ const CreateRoleModal: React.FC<CreateRoleModalProps> = ({ onClose, onSuccess })
                             type="text"
                             value={generatedId}
                             disabled
-                            style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)', backgroundColor: 'rgba(0,0,0,0.05)', color: 'var(--color-text-muted)', cursor: 'not-allowed' }}
+                            className="input-field"
+                            style={{ opacity: 0.7, cursor: 'not-allowed' }}
                         />
                     </div>
 
