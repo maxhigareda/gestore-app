@@ -18,6 +18,7 @@ const CargosPage: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [roleToEdit, setRoleToEdit] = useState<JobTitle | null>(null);
+    const [roleToDelete, setRoleToDelete] = useState<JobTitle | null>(null);
 
     useEffect(() => {
         fetchRoles();
