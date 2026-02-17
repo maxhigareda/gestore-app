@@ -12,6 +12,7 @@ export interface UnifiedRequest {
     userId: string;
     userName: string;
     supervisorId?: string; // To filter 'Mis Pendientes'
+    managerId?: string; // Explicit Manager UUID
     startDate: string;
     endDate: string;
     status: 'Solicitada' | 'Aprobada' | 'Rechazada';
@@ -69,7 +70,7 @@ const RequestsPage: React.FC = () => {
             if (userIds.size > 0) {
                 const { data: profilesData, error: profError } = await supabase
                     .from('profiles')
-                    .select('id, first_name, last_name, supervisor')
+                    .select('id, first_name, last_name, supervisor, manager_id')
                     .in('id', Array.from(userIds));
 
                 if (profError) {
@@ -93,6 +94,7 @@ const RequestsPage: React.FC = () => {
                     userId: r.user_id,
                     userName: profile ? `${profile.first_name} ${profile.last_name}` : 'Desconocido',
                     supervisorId: profile?.supervisor,
+                    managerId: profile?.manager_id,
                     startDate: r.start_date,
                     endDate: r.end_date,
                     status: r.status,
@@ -111,6 +113,7 @@ const RequestsPage: React.FC = () => {
                     userId: r.user_id,
                     userName: profile ? `${profile.first_name} ${profile.last_name}` : 'Desconocido',
                     supervisorId: profile?.supervisor,
+                    managerId: profile?.manager_id,
                     startDate: r.start_date,
                     endDate: r.end_date,
                     status: r.status,
@@ -139,14 +142,11 @@ const RequestsPage: React.FC = () => {
         if (activeTab === 'pending') {
             // "Mis Pendientes": 
             // 1. Status is 'Solicitada'
-            // 2. I am the supervisor. (Matching name for now as per current schema limitation)
-            // Note: Ideally we compare IDs. 
-            // If user is Admin, maybe show all? User said "Todas" is for Admin.
-            // "Mis Pendientes" is for Supervisor.
-            // Let's filter by Status 'Solicitada' AND (Supervisor Name === My Name OR I am Admin).
-            // Retrieving my profile name... handled in Context usually or separate fetch.
-            // For now, I'll allow ALL Pending in this tab for easy testing, filtering only by status 'Solicitada'.
-            filtered = filtered.filter(r => r.status === 'Solicitada');
+            // 2. I am the manager (manager_id matches my ID)
+            filtered = filtered.filter(r =>
+                r.status === 'Solicitada' &&
+                r.managerId === user?.id
+            );
         } else if (activeTab === 'my_requests') {
             // "Mis Solicitudes": Created by Me
             filtered = filtered.filter(r => r.userId === user?.id);
