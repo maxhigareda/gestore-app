@@ -49,16 +49,25 @@ const PermisosTab: React.FC = () => {
 
     const fetchPermissions = async () => {
         if (!user) return;
+        setLoading(true);
         try {
+            console.log('Fetching permissions for user:', user.id);
             const { data, error } = await supabase
                 .from('permission_requests')
                 .select('*')
+                .eq('user_id', user.id) // Explicitly filter
                 .order('start_date', { ascending: false });
 
-            if (error) throw error;
+            if (error) {
+                console.error('Supabase error fetching permissions:', error);
+                throw error;
+            }
+
+            console.log('Permissions data:', data);
             setRequests((data || []) as PermissionRequest[]);
         } catch (error) {
             console.error('Error fetching permissions:', error);
+            // Optional: Set UI error state
         } finally {
             setLoading(false);
         }
@@ -182,9 +191,7 @@ const PermisosTab: React.FC = () => {
                         <PermissionRequestModal
                             onClose={handleCloseModal}
                             onSuccess={handleSuccess}
-                            // @ts-ignore - Pending update to Modal component
                             mode={modalMode}
-                            // @ts-ignore - Pending update to Modal component
                             initialData={selectedRequest ? {
                                 id: selectedRequest.id,
                                 startDate: selectedRequest.start_date,
