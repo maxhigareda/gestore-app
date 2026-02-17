@@ -13,7 +13,6 @@ const SecondarySidebar: React.FC = () => {
     // If path is root '/' or starts with these, it's Home module
     const isHomeModule = path === '/' || ['/portal', '/ficha', '/team', '/surveys', '/training-my', '/evaluations', '/recognition', '/org-chart', '/directory'].some(p => path.startsWith(p));
     const isAdminModule = path.startsWith('/admin');
-    const isOrgDevModule = path.startsWith('/org-dev');
     const isTrainingModule = path.startsWith('/training') && !path.startsWith('/training-my');
 
     // Sidebar State
@@ -157,10 +156,7 @@ const SecondarySidebar: React.FC = () => {
 
                 {openMenus['organization'] && (
                     <div style={{ paddingLeft: '1rem', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        <SubMenuLink label="Gestión Org." onClick={() => navigate('/admin/organization')} />
-                        <SubMenuLink label="Cargos" onClick={() => { }} />
-                        <SubMenuLink label="Áreas" onClick={() => { }} />
-                        <SubMenuLink label="Puestos" onClick={() => { }} />
+                        <SubMenuLink label="Cargos (Roles y Áreas)" onClick={() => navigate('/admin/organization')} />
                     </div>
                 )}
             </div>
@@ -224,7 +220,6 @@ const SecondarySidebar: React.FC = () => {
             <div style={{ flex: 1, overflowY: 'auto' }}>
                 {isHomeModule && renderHomeMenu()}
                 {isAdminModule && renderAdminMenu()}
-                {isOrgDevModule && <div style={{ padding: '1.5rem' }}><h3>Desarrollo Org.</h3><p>Submenú...</p></div>}
                 {isTrainingModule && <div style={{ padding: '1.5rem' }}><h3>Capacitaciones</h3><p>Submenú...</p></div>}
             </div>
         </aside>

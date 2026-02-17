@@ -36,7 +36,7 @@ const CreateCollaborator: React.FC = () => {
         area: '',
         role: '',
         division: '',
-        company: 'GeStore',
+        company: 'The Store Intelligence',
         costCenter: '',
         supervisorId: '', // UUID
         team: '',
@@ -57,9 +57,26 @@ const CreateCollaborator: React.FC = () => {
     const [csvPreview, setCsvPreview] = useState<any[] | null>(null);
     const [showCsvModal, setShowCsvModal] = useState(false);
 
+    const [availableRoles, setAvailableRoles] = useState<any[]>([]); // { id, name, department }
+    const [availableAreas, setAvailableAreas] = useState<string[]>([]);
+    const [filteredRoles, setFilteredRoles] = useState<any[]>([]);
+
     useEffect(() => {
         fetchCollaborators();
+        fetchJobTitles();
     }, []);
+
+    const fetchJobTitles = async () => {
+        const { data } = await supabase
+            .from('job_titles')
+            .select('*')
+            .order('name');
+        if (data) {
+            setAvailableRoles(data);
+            const areas = Array.from(new Set(data.map((r: any) => r.department)));
+            setAvailableAreas(areas as string[]);
+        }
+    };
 
     const fetchCollaborators = async () => {
         const { data } = await supabase
@@ -75,6 +92,18 @@ const CreateCollaborator: React.FC = () => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+
+        if (name === 'area') {
+            // Filter roles based on selected area
+            if (value) {
+                const rolesInArea = availableRoles.filter(r => r.department === value);
+                setFilteredRoles(rolesInArea);
+            } else {
+                setFilteredRoles([]);
+            }
+            // Reset role if area changes
+            setFormData(prev => ({ ...prev, area: value, role: '' }));
+        }
     };
 
     const handleWorkDaysChange = (day: string) => {
@@ -638,12 +667,29 @@ const CreateCollaborator: React.FC = () => {
 
                         <div className="form-group">
                             <label>Área (Departamento)*</label>
-                            <input type="text" name="area" value={formData.area} onChange={handleChange} required className="input-field" placeholder="Ej. Ventas, Gerencia" />
+                            <select name="area" value={formData.area} onChange={handleChange} required className="input-field">
+                                <option value="">- Seleccione Área -</option>
+                                {availableAreas.map(area => (
+                                    <option key={area} value={area}>{area}</option>
+                                ))}
+                            </select>
                         </div>
 
                         <div className="form-group">
                             <label>Puesto (Rol)*</label>
-                            <input type="text" name="role" value={formData.role} onChange={handleChange} required className="input-field" />
+                            <select
+                                name="role"
+                                value={formData.role}
+                                onChange={handleChange}
+                                required
+                                className="input-field"
+                                disabled={!formData.area}
+                            >
+                                <option value="">- Seleccione Puesto -</option>
+                                {filteredRoles.map((role: any) => (
+                                    <option key={role.id} value={role.name}>{role.name}</option>
+                                ))}
+                            </select>
                         </div>
 
                         <div className="form-group">
