@@ -39,38 +39,60 @@ const RequestsPage: React.FC = () => {
         if (!user) return;
         setLoading(true);
         try {
-            // 1. Fetch Vacations with Profiles
+            // 1. Fetch Vacations (Raw)
             const { data: vacData, error: vacError } = await supabase
                 .from('vacation_requests')
-                .select('*, profiles:user_id (id, first_name, last_name, supervisor)');
+                .select('*');
 
-            // 2. Fetch Permissions with Profiles
+            if (vacError) {
+                console.error('Error fetching vacations:', vacError);
+                throw vacError;
+            }
+
+            // 2. Fetch Permissions (Raw)
             const { data: permData, error: permError } = await supabase
                 .from('permission_requests')
-                .select('*, profiles:user_id (id, first_name, last_name, supervisor)');
+                .select('*');
 
-            if (vacError) throw vacError;
-            if (permError) throw permError;
+            if (permError) {
+                console.error('Error fetching permissions:', permError);
+                throw permError;
+            }
 
-            // 3. Normalize & Merge
+            // 3. Get User IDs to fetch necessary profiles
+            const userIds = new Set<string>();
+            vacData?.forEach((r: any) => userIds.add(r.user_id));
+            permData?.forEach((r: any) => userIds.add(r.user_id));
+
+            // 4. Fetch Profiles
+            let profilesMap: { [key: string]: any } = {};
+            if (userIds.size > 0) {
+                const { data: profilesData, error: profError } = await supabase
+                    .from('profiles')
+                    .select('id, first_name, last_name, supervisor')
+                    .in('id', Array.from(userIds));
+
+                if (profError) {
+                    console.error('Error fetching profiles:', profError);
+                }
+
+                profilesData?.forEach((p: any) => {
+                    profilesMap[p.id] = p;
+                });
+            }
+
+            // 5. Normalize & Merge
             const unified: UnifiedRequest[] = [];
 
             vacData?.forEach((r: any) => {
+                const profile = profilesMap[r.user_id];
                 unified.push({
                     id: r.id,
                     type: 'vacation',
                     requestType: 'Vacaciones',
                     userId: r.user_id,
-                    userName: r.profiles ? `${r.profiles.first_name} ${r.profiles.last_name}` : 'Desconocido',
-                    supervisorId: r.profiles?.supervisor, // Warning: 'supervisor' in profile is text name in current schema, we might need ID lookup or change schema. 
-                    // For THIS MVP, we will assume strict string matching or fix schema later. 
-                    // Wait, 'Mis Pendientes' logic: "requests where supervisor_id == current_user.id".
-                    // Current 'profiles' table has 'supervisor' as TEXT (Name). 
-                    // This is a known issue. We will just show ALL 'Solicitada' for now for 'All' tab, 
-                    // and for 'Pending', we might need to rely on 'supervisor' text matching user name? 
-                    // OR just show all pending for Admin role?
-                    // User said: "como supervisor directo debo aprobar".
-                    // Let's grab the current user's name and match it against the profile 'supervisor' field.
+                    userName: profile ? `${profile.first_name} ${profile.last_name}` : 'Desconocido',
+                    supervisorId: profile?.supervisor,
                     startDate: r.start_date,
                     endDate: r.end_date,
                     status: r.status,
@@ -81,13 +103,14 @@ const RequestsPage: React.FC = () => {
             });
 
             permData?.forEach((r: any) => {
+                const profile = profilesMap[r.user_id];
                 unified.push({
                     id: r.id,
                     type: 'permission',
-                    requestType: r.type,
+                    requestType: r.type || 'Permiso',
                     userId: r.user_id,
-                    userName: r.profiles ? `${r.profiles.first_name} ${r.profiles.last_name}` : 'Desconocido',
-                    supervisorId: r.profiles?.supervisor,
+                    userName: profile ? `${profile.first_name} ${profile.last_name}` : 'Desconocido',
+                    supervisorId: profile?.supervisor,
                     startDate: r.start_date,
                     endDate: r.end_date,
                     status: r.status,
@@ -98,7 +121,7 @@ const RequestsPage: React.FC = () => {
             });
 
             // Sort by Date Descending
-            unified.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+            unified.sort((a, b) => new Date(b.created_at || b.startDate).getTime() - new Date(a.created_at || a.startDate).getTime());
 
             setRequests(unified);
 
