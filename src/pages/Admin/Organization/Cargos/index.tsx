@@ -17,7 +17,7 @@ const CargosPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [roleToDelete, setRoleToDelete] = useState<JobTitle | null>(null);
+    const [roleToEdit, setRoleToEdit] = useState<JobTitle | null>(null);
 
     useEffect(() => {
         fetchRoles();
@@ -34,24 +34,21 @@ const CargosPage: React.FC = () => {
 
             if (rolesError) throw rolesError;
 
-            // 2. Fetch Collaborator Counts (Optional optimization: do this in backend view)
-            // For now, we'll fetch all profiles and count in memory if dataset is small, 
-            // or do a separate count query. 
-            // Let's do a separate count query for simplicity in MVP.
-            // Actually, `count` per group is better with `.rpc` or view. 
-            // We'll skip count for now to speed up implementation unless critical.
-            // User requested "# de Colaboradores".
-
+            // 2. Fetch all profiles to count
             const { data: profiles, error: profError } = await supabase
                 .from('profiles')
-                .select('job_title, area'); // Assuming profiles have these fields joined/synced? 
-            // Ah, profiles currently store text. We need to match by text name.
+                .select('job_title, department');
+
+            if (profError) throw profError;
 
             const counts: { [key: string]: number } = {};
             if (profiles) {
                 profiles.forEach((p: any) => {
-                    const key = `${p.area}-${p.job_title}`; // Composite key
-                    counts[key] = (counts[key] || 0) + 1;
+                    // Match by text: Department(Area) + JobTitle(Role)
+                    if (p.department && p.job_title) {
+                        const key = `${p.department}-${p.job_title}`;
+                        counts[key] = (counts[key] || 0) + 1;
+                    }
                 });
             }
 
@@ -85,6 +82,16 @@ const CargosPage: React.FC = () => {
         }
     };
 
+    const handleEdit = (role: JobTitle) => {
+        setRoleToEdit(role);
+        setIsCreateModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsCreateModalOpen(false);
+        setRoleToEdit(null);
+    };
+
     const filteredRoles = roles.filter(r =>
         r.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         r.department.toLowerCase().includes(searchTerm.toLowerCase())
@@ -98,7 +105,10 @@ const CargosPage: React.FC = () => {
                     <p style={{ color: 'var(--color-text-muted)' }}>Gestión de Áreas y Puestos de la organización.</p>
                 </div>
                 <button
-                    onClick={() => setIsCreateModalOpen(true)}
+                    onClick={() => {
+                        setRoleToEdit(null);
+                        setIsCreateModalOpen(true);
+                    }}
                     style={{
                         backgroundColor: 'var(--color-primary)',
                         color: 'white',
@@ -180,6 +190,7 @@ const CargosPage: React.FC = () => {
                                         <td style={{ padding: '1rem' }}>
                                             <div style={{ display: 'flex', gap: '10px' }}>
                                                 <button
+                                                    onClick={() => handleEdit(role)}
                                                     style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-secondary)' }}
                                                     title="Editar"
                                                 >
@@ -204,11 +215,12 @@ const CargosPage: React.FC = () => {
 
             {isCreateModalOpen && (
                 <CreateRoleModal
-                    onClose={() => setIsCreateModalOpen(false)}
+                    onClose={handleCloseModal}
                     onSuccess={() => {
-                        setIsCreateModalOpen(false);
+                        handleCloseModal();
                         fetchRoles();
                     }}
+                    roleToEdit={roleToEdit}
                 />
             )}
 

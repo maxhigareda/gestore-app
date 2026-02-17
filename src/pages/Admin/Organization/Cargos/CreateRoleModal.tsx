@@ -5,9 +5,10 @@ import { X } from 'lucide-react';
 interface CreateRoleModalProps {
     onClose: () => void;
     onSuccess: () => void;
+    roleToEdit?: { id: string, name: string, department: string } | null;
 }
 
-const CreateRoleModal: React.FC<CreateRoleModalProps> = ({ onClose, onSuccess }) => {
+const CreateRoleModal: React.FC<CreateRoleModalProps> = ({ onClose, onSuccess, roleToEdit }) => {
     const [areas, setAreas] = useState<string[]>([]);
     const [selectedArea, setSelectedArea] = useState(''); // 'new_area' or existing name
     const [newAreaName, setNewAreaName] = useState('');
@@ -17,8 +18,14 @@ const CreateRoleModal: React.FC<CreateRoleModalProps> = ({ onClose, onSuccess })
 
     useEffect(() => {
         fetchAreas();
-        setGeneratedId(crypto.randomUUID());
-    }, []);
+        if (roleToEdit) {
+            setSelectedArea(roleToEdit.department);
+            setRoleName(roleToEdit.name);
+            setGeneratedId(roleToEdit.id);
+        } else {
+            setGeneratedId(crypto.randomUUID());
+        }
+    }, [roleToEdit]);
 
     const fetchAreas = async () => {
         // Fetch distinct departments from job_titles
@@ -46,20 +53,35 @@ const CreateRoleModal: React.FC<CreateRoleModalProps> = ({ onClose, onSuccess })
         }
 
         try {
-            const { error } = await supabase
-                .from('job_titles')
-                .insert({
-                    id: generatedId,
-                    name: roleName,
-                    department: department,
-                    company: 'The Store Intelligence'
-                });
+            if (roleToEdit) {
+                // UPDATE
+                const { error } = await supabase
+                    .from('job_titles')
+                    .update({
+                        name: roleName,
+                        department: department,
+                        // id is not updatable usually, keeping same
+                    })
+                    .eq('id', roleToEdit.id);
 
-            if (error) throw error;
+                if (error) throw error;
+            } else {
+                // INSERT
+                const { error } = await supabase
+                    .from('job_titles')
+                    .insert({
+                        id: generatedId,
+                        name: roleName,
+                        department: department,
+                        company: 'The Store Intelligence'
+                    });
+
+                if (error) throw error;
+            }
             onSuccess();
         } catch (error) {
-            console.error('Error creating role:', error);
-            alert('Error al crear el cargo.');
+            console.error('Error saving role:', error);
+            alert('Error al guardar el cargo.');
         } finally {
             setLoading(false);
         }
@@ -75,7 +97,7 @@ const CreateRoleModal: React.FC<CreateRoleModalProps> = ({ onClose, onSuccess })
                 boxShadow: '0 4px 20px rgba(0,0,0,0.2)', maxWidth: '500px', width: '100%'
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: 600 }}>Crear Nuevo Cargo</h3>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 600 }}>{roleToEdit ? 'Editar Cargo' : 'Crear Nuevo Cargo'}</h3>
                     <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-secondary)' }}><X size={24} /></button>
                 </div>
 
@@ -152,7 +174,7 @@ const CreateRoleModal: React.FC<CreateRoleModalProps> = ({ onClose, onSuccess })
                             disabled={loading}
                             style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', backgroundColor: 'var(--color-primary)', color: 'white', fontWeight: 600, cursor: 'pointer', opacity: loading ? 0.7 : 1 }}
                         >
-                            {loading ? 'Creando...' : 'Crear Cargo'}
+                            {loading ? (roleToEdit ? 'Guardando...' : 'Creando...') : (roleToEdit ? 'Guardar Cambios' : 'Crear Cargo')}
                         </button>
                     </div>
 
