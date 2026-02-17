@@ -22,19 +22,54 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
     const [activeTab, setActiveTab] = useState<'personal' | 'job'>('personal');
     const [collaborators, setCollaborators] = useState<any[]>([]); // For Supervisor/Substitute dropdowns
 
+    const [availableRoles, setAvailableRoles] = useState<any[]>([]);
+    const [availableAreas, setAvailableAreas] = useState<string[]>([]);
+    const [filteredRoles, setFilteredRoles] = useState<any[]>([]);
+
     useEffect(() => {
-        const fetchCollaborators = async () => {
-            const { data } = await supabase
+        const fetchData = async () => {
+            // Fetch Collaborators
+            const { data: collabData } = await supabase
                 .from('profiles')
                 .select('id, first_name, last_name, job_title')
                 .order('first_name');
-            if (data) setCollaborators(data);
+            if (collabData) setCollaborators(collabData);
+
+            // Fetch Job Titles
+            const { data: rolesData } = await supabase
+                .from('job_titles')
+                .select('*')
+                .order('name');
+
+            if (rolesData) {
+                setAvailableRoles(rolesData);
+                const areas = Array.from(new Set(rolesData.map((r: any) => r.department)));
+                setAvailableAreas(areas as string[]);
+
+                // Initial Filter if user has area
+                if (user.department) {
+                    const rolesInArea = rolesData.filter((r: any) => r.department === user.department);
+                    setFilteredRoles(rolesInArea);
+                } else if (user.company) {
+                    // Fallback or just Empty
+                }
+            }
         };
-        fetchCollaborators();
+        fetchData();
     }, []);
 
     const handleChange = (field: keyof UserProfile, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleAreaChange = (newArea: string) => {
+        setFormData(prev => ({ ...prev, area: newArea, role: '' })); // Reset role
+        if (newArea) {
+            const rolesInArea = availableRoles.filter(r => r.department === newArea);
+            setFilteredRoles(rolesInArea);
+        } else {
+            setFilteredRoles([]);
+        }
     };
 
     const handleWorkDaysChange = (day: string) => {
@@ -205,7 +240,8 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
                                     <select
                                         value={formData.birthCountry}
                                         onChange={e => handleChange('birthCountry', e.target.value)}
-                                        style={selectStyle}
+                                        onChange={e => handleChange('birthCountry', e.target.value)}
+                                        className="input-field"
                                     >
                                         <option value="México">México</option>
                                         <option value="Otro">Otro</option>
@@ -216,7 +252,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
                                     <select
                                         value={formData.maritalStatus}
                                         onChange={e => handleChange('maritalStatus', e.target.value)}
-                                        style={selectStyle}
+                                        className="input-field"
                                     >
                                         <option value="">Seleccione...</option>
                                         <option value="Soltero/a">Soltero/a</option>
@@ -233,7 +269,8 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
                                         value={isMexico ? 'RFC' : formData.documentType}
                                         onChange={e => handleChange('documentType', e.target.value)}
                                         disabled={isMexico}
-                                        style={{ ...selectStyle, opacity: isMexico ? 0.7 : 1 }}
+                                        className="input-field"
+                                        style={{ opacity: isMexico ? 0.7 : 1 }}
                                     >
                                         <option value="RFC">RFC</option>
                                         <option value="Otro">Otro</option>
@@ -255,8 +292,35 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
                             <>
                                 <Field label="Empresa" value={formData.company} onChange={v => handleChange('company', v)} />
                                 <Field label="Fecha Ingreso Compañía" value={formData.companyEntryDate} type="date" onChange={v => handleChange('companyEntryDate', v)} />
-                                <Field label="Puesto (Role)" value={formData.role} fullWidth onChange={v => handleChange('role', v)} />
-                                <Field label="Área / Departamento" value={formData.area} onChange={v => handleChange('area', v)} />
+                                <div style={{ gridColumn: 'auto' }}>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--color-text-secondary)', fontWeight: 500 }}>Área / Departamento</label>
+                                    <select
+                                        value={formData.area || ''}
+                                        onChange={e => handleAreaChange(e.target.value)}
+                                        className="input-field"
+                                    >
+                                        <option value="">- Seleccione Área -</option>
+                                        {availableAreas.map(area => (
+                                            <option key={area} value={area}>{area}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div style={{ gridColumn: 'auto' }}>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--color-text-secondary)', fontWeight: 500 }}>Puesto (Role)</label>
+                                    <select
+                                        value={formData.role || ''}
+                                        onChange={e => handleChange('role', e.target.value)}
+                                        className="input-field"
+                                        disabled={!formData.area}
+                                    >
+                                        <option value="">- Seleccione Puesto -</option>
+                                        {filteredRoles.map((role: any) => (
+                                            <option key={role.id} value={role.name}>{role.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
                                 <Field label="División" value={formData.division} onChange={v => handleChange('division', v)} />
                                 <Field label="Centro de Costos" value={formData.costCenter} onChange={v => handleChange('costCenter', v)} />
 
@@ -265,7 +329,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
                                     <select
                                         value={formData.supervisor || ''}
                                         onChange={e => handleChange('supervisor', e.target.value)}
-                                        style={selectStyle}
+                                        className="input-field"
                                     >
                                         <option value="">- Seleccione -</option>
                                         {collaborators.map(c => (
@@ -282,7 +346,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
                                     <select
                                         value={formData.substitute || ''}
                                         onChange={e => handleChange('substitute', e.target.value)}
-                                        style={selectStyle}
+                                        className="input-field"
                                     >
                                         <option value="">- Seleccione -</option>
                                         {collaborators.map(c => (
@@ -302,7 +366,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
                                 <Field label="Sueldo Base" value={String(formData.salary || '')} type="number" onChange={v => handleChange('salary', v ? parseFloat(v) : 0)} />
                                 <div style={{ gridColumn: 'auto' }}>
                                     <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--color-text-secondary)', fontWeight: 500 }}>Tipo de Compensación</label>
-                                    <select value={formData.compensationType || ''} onChange={e => handleChange('compensationType', e.target.value)} style={selectStyle}>
+                                    <select value={formData.compensationType || ''} onChange={e => handleChange('compensationType', e.target.value)} className="input-field">
                                         <option value="">Seleccione...</option>
                                         <option value="Fijo">Fijo</option>
                                         <option value="Variable">Variable</option>
@@ -312,7 +376,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
 
                                 <div style={{ gridColumn: 'auto' }}>
                                     <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--color-text-secondary)', fontWeight: 500 }}>Turno</label>
-                                    <select value={formData.shift || ''} onChange={e => handleChange('shift', e.target.value)} style={selectStyle}>
+                                    <select value={formData.shift || ''} onChange={e => handleChange('shift', e.target.value)} className="input-field">
                                         <option value="">Seleccione...</option>
                                         <option value="Diurna">Diurna</option>
                                         <option value="Nocturna">Nocturna</option>
@@ -389,26 +453,15 @@ const Field: React.FC<FieldProps> = ({ label, value, onChange, type = 'text', di
             value={value || ''}
             onChange={e => onChange && onChange(e.target.value)}
             disabled={disabled}
+            className="input-field"
             style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: '6px',
-                border: '1px solid var(--border-color)',
-                backgroundColor: disabled ? 'var(--color-background)' : 'var(--color-surface)',
-                color: 'var(--color-text-primary)',
+                backgroundColor: disabled ? 'var(--color-background)' : undefined, // Keep specific overriding logic if needed, but class handles base
                 opacity: disabled ? 0.6 : 1
             }}
         />
     </div>
 );
 
-const selectStyle = {
-    width: '100%',
-    padding: '10px',
-    borderRadius: '6px',
-    border: '1px solid var(--border-color)',
-    backgroundColor: 'var(--color-surface)',
-    color: 'var(--color-text-primary)'
-};
+
 
 export default EditProfileModal;
