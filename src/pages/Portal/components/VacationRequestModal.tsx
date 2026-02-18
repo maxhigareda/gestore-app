@@ -179,6 +179,7 @@ const VacationRequestModal: React.FC<VacationRequestModalProps> = ({
                     <button
                         type="submit"
                         disabled={!isValid}
+                        className="btn-primary"
                         style={{
                             ...primaryButtonStyle,
                             opacity: isValid ? 1 : 0.5,
@@ -214,8 +215,6 @@ const primaryButtonStyle: React.CSSProperties = {
     padding: '12px',
     borderRadius: '6px',
     border: 'none',
-    backgroundColor: 'var(--color-primary)',
-    color: 'white',
     fontWeight: 600,
     cursor: 'pointer'
 };

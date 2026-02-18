@@ -114,3 +114,23 @@ button:focus-visible {
     color: #333333;
   }
 }
+
+/* Primary Action Button (White BG, Blue Text) */
+.btn-primary {
+  background-color: #ffffff !important;
+  color: #0073ea !important;
+  /* Standard Blue */
+  border: 1px solid #ffffff !important;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: #f0f0f0 !important;
+  box-shadow: 0 2px 8px rgba(0, 115, 234, 0.2);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

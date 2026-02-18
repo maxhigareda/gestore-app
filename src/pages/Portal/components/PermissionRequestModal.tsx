@@ -173,6 +173,7 @@ const PermissionRequestModal: React.FC<PermissionRequestModalProps> = ({
                     <button
                         type="submit"
                         disabled={daysRequested <= 0}
+                        className="btn-primary"
                         style={{
                             ...primaryButtonStyle,
                             opacity: daysRequested > 0 ? 1 : 0.5,
@@ -209,8 +210,6 @@ const primaryButtonStyle: React.CSSProperties = {
     padding: '12px',
     borderRadius: '6px',
     border: 'none',
-    backgroundColor: 'var(--color-primary)',
-    color: 'white',
     fontWeight: 600,
     cursor: 'pointer'
 };

@@ -818,11 +818,11 @@ const CreateCollaborator: React.FC = () => {
                     )}
 
                     {step === 1 ? (
-                        <button type="button" onClick={() => setStep(2)} className="btn-primary" style={{ backgroundColor: 'var(--color-primary)', color: 'white', padding: '0.8rem 2rem', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
+                        <button type="button" onClick={() => setStep(2)} className="btn-primary" style={{ padding: '0.8rem 2rem', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
                             Datos de Trabajo -&gt;
                         </button>
                     ) : (
-                        <button type="submit" disabled={loading} className="btn-primary" style={{ backgroundColor: 'var(--color-primary)', color: 'white', padding: '0.8rem 2rem', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 600, opacity: loading ? 0.7 : 1 }}>
+                        <button type="submit" disabled={loading} className="btn-primary" style={{ padding: '0.8rem 2rem', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 600, opacity: loading ? 0.7 : 1 }}>
                             {loading ? 'Guardando...' : 'Crear Colaborador'}
                         </button>
                     )}

@@ -419,9 +419,10 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
                         type="submit"
                         form="edit-profile-form"
                         disabled={saving}
+                        className="btn-primary"
                         style={{
                             padding: '10px 24px', borderRadius: '6px', border: 'none',
-                            backgroundColor: 'var(--color-primary)', color: 'white', cursor: 'pointer',
+                            cursor: 'pointer',
                             display: 'flex', alignItems: 'center', gap: '8px', opacity: saving ? 0.7 : 1
                         }}
                     >

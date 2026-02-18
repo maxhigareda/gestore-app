@@ -172,7 +172,8 @@ const CreateRoleModal: React.FC<CreateRoleModalProps> = ({ onClose, onSuccess, r
                         <button
                             type="submit"
                             disabled={loading}
-                            style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', backgroundColor: 'var(--color-primary)', color: 'white', fontWeight: 600, cursor: 'pointer', opacity: loading ? 0.7 : 1 }}
+                            className="btn-primary"
+                            style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', fontWeight: 600, cursor: 'pointer', opacity: loading ? 0.7 : 1 }}
                         >
                             {loading ? (roleToEdit ? 'Guardando...' : 'Creando...') : (roleToEdit ? 'Guardar Cambios' : 'Crear Cargo')}
                         </button>
