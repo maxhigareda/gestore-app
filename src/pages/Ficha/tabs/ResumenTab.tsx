@@ -5,34 +5,7 @@ interface ResumenTabProps {
     user: UserProfile;
 }
 
-const calculateTenure = (dateString?: string) => {
-    if (!dateString) return '';
-    const start = new Date(dateString);
-    const now = new Date();
-    let years = now.getFullYear() - start.getFullYear();
-    let months = now.getMonth() - start.getMonth();
 
-    if (months < 0) {
-        years--;
-        months += 12;
-    }
-
-    // Adjust if day of month hasn't occurred yet
-    if (now.getDate() < start.getDate()) {
-        months--;
-        if (months < 0) {
-            years--;
-            months += 12;
-        }
-    }
-
-    const parts = [];
-    if (years > 0) parts.push(`${years} ${years === 1 ? 'año' : 'años'}`);
-    if (months > 0) parts.push(`${months} ${months === 1 ? 'mes' : 'meses'}`);
-
-    if (parts.length === 0) return '(Menos de 1 mes)';
-    return `(${parts.join(', ')})`;
-};
 
 const ResumenTab: React.FC<ResumenTabProps> = ({ user }) => {
     const fields = [
@@ -51,7 +24,7 @@ const ResumenTab: React.FC<ResumenTabProps> = ({ user }) => {
         {
             label: 'Fecha de Ingreso',
             value: user.companyEntryDate
-                ? `${user.companyEntryDate.split('-').reverse().join('/')} ${calculateTenure(user.companyEntryDate)}`
+                ? `${user.companyEntryDate.split('-').reverse().join('/')}`
                 : ''
         },
         { label: 'Saldo de Vacaciones', value: `${user.vacationBalance} días` },
