@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { useUnifiedRequests, UnifiedRequest } from '../../../../hooks/useUnifiedRequests';
+import { useUnifiedRequests, type UnifiedRequest } from '../../../../hooks/useUnifiedRequests';
 import { useAuth } from '../../../../context/AuthContext';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Filter } from 'lucide-react';
 
 const CalendarPage: React.FC = () => {
     const { user } = useAuth();
-    const { requests, loading } = useUnifiedRequests(user?.id || '');
+    const { requests } = useUnifiedRequests(user?.id || '');
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedArea, setSelectedArea] = useState('Todas'); // Placeholder for Area Filter
 

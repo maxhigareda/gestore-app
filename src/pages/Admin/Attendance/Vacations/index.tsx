@@ -3,7 +3,7 @@ import { supabase } from '../../../../lib/supabaseClient';
 import { useAuth } from '../../../../context/AuthContext';
 import { Trash2, Eye } from 'lucide-react';
 import RequestActionModal from '../../Collaborators/Requests/RequestActionModal';
-import { useUnifiedRequests, UnifiedRequest } from '../../../../hooks/useUnifiedRequests';
+import { useUnifiedRequests, type UnifiedRequest } from '../../../../hooks/useUnifiedRequests';
 
 const VacationsPage: React.FC = () => {
     const { user } = useAuth();

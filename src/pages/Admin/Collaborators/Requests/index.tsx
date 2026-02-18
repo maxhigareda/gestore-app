@@ -1,139 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../../../context/AuthContext';
-import { supabase } from '../../../../lib/supabaseClient';
+// import { supabase } from '../../../../lib/supabaseClient'; // Removed as logic moved to hook
 import { Eye, Calendar, Search } from 'lucide-react';
 import RequestActionModal from './RequestActionModal';
-
-// Types
-export interface UnifiedRequest {
-    id: string;
-    type: 'vacation' | 'permission';
-    requestType: string; // 'Vacaciones', 'Permiso Personal', etc.
-    userId: string;
-    userName: string;
-    supervisorId?: string; // To filter 'Mis Pendientes'
-    managerId?: string; // Explicit Manager UUID
-    startDate: string;
-    endDate: string;
-    status: 'Solicitada' | 'Aprobada' | 'Rechazada';
-    days: number;
-    reason?: string;
-    created_at: string;
-}
+import { useUnifiedRequests, type UnifiedRequest } from '../../../../hooks/useUnifiedRequests';
 
 const RequestsPage: React.FC = () => {
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState<'pending' | 'my_requests' | 'all'>('pending');
-    const [requests, setRequests] = useState<UnifiedRequest[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { requests, loading, fetchRequests } = useUnifiedRequests();
     const [selectedRequest, setSelectedRequest] = useState<UnifiedRequest | null>(null);
 
     // Filters for 'All' tab
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'All' | 'Solicitada' | 'Aprobada' | 'Rechazada'>('All');
-
-    useEffect(() => {
-        if (user) fetchRequests();
-    }, [user]);
-
-    const fetchRequests = async () => {
-        if (!user) return;
-        setLoading(true);
-        try {
-            // 1. Fetch Vacations (Raw)
-            const { data: vacData, error: vacError } = await supabase
-                .from('vacation_requests')
-                .select('*');
-
-            if (vacError) {
-                console.error('Error fetching vacations:', vacError);
-                throw vacError;
-            }
-
-            // 2. Fetch Permissions (Raw)
-            const { data: permData, error: permError } = await supabase
-                .from('permission_requests')
-                .select('*');
-
-            if (permError) {
-                console.error('Error fetching permissions:', permError);
-                throw permError;
-            }
-
-            // 3. Get User IDs to fetch necessary profiles
-            const userIds = new Set<string>();
-            vacData?.forEach((r: any) => userIds.add(r.user_id));
-            permData?.forEach((r: any) => userIds.add(r.user_id));
-
-            // 4. Fetch Profiles
-            let profilesMap: { [key: string]: any } = {};
-            if (userIds.size > 0) {
-                const { data: profilesData, error: profError } = await supabase
-                    .from('profiles')
-                    .select('id, first_name, last_name, supervisor, manager_id')
-                    .in('id', Array.from(userIds));
-
-                if (profError) {
-                    console.error('Error fetching profiles:', profError);
-                }
-
-                profilesData?.forEach((p: any) => {
-                    profilesMap[p.id] = p;
-                });
-            }
-
-            // 5. Normalize & Merge
-            const unified: UnifiedRequest[] = [];
-
-            vacData?.forEach((r: any) => {
-                const profile = profilesMap[r.user_id];
-                unified.push({
-                    id: r.id,
-                    type: 'vacation',
-                    requestType: 'Vacaciones',
-                    userId: r.user_id,
-                    userName: profile ? `${profile.first_name} ${profile.last_name}` : 'Desconocido',
-                    supervisorId: profile?.supervisor,
-                    managerId: profile?.manager_id,
-                    startDate: r.start_date,
-                    endDate: r.end_date,
-                    status: r.status,
-                    days: r.days_taken,
-                    reason: r.comments,
-                    created_at: r.created_at
-                });
-            });
-
-            permData?.forEach((r: any) => {
-                const profile = profilesMap[r.user_id];
-                unified.push({
-                    id: r.id,
-                    type: 'permission',
-                    requestType: r.type || 'Permiso',
-                    userId: r.user_id,
-                    userName: profile ? `${profile.first_name} ${profile.last_name}` : 'Desconocido',
-                    supervisorId: profile?.supervisor,
-                    managerId: profile?.manager_id,
-                    startDate: r.start_date,
-                    endDate: r.end_date,
-                    status: r.status,
-                    days: r.days_requested,
-                    reason: r.reason,
-                    created_at: r.created_at
-                });
-            });
-
-            // Sort by Date Descending
-            unified.sort((a, b) => new Date(b.created_at || b.startDate).getTime() - new Date(a.created_at || a.startDate).getTime());
-
-            setRequests(unified);
-
-        } catch (error) {
-            console.error('Error fetching requests:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     // Filter Logic
     const getFilteredRequests = () => {

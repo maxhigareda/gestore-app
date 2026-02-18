@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Check, XCircle } from 'lucide-react';
 import { supabase } from '../../../../lib/supabaseClient';
-import type { UnifiedRequest } from './index';
+import type { UnifiedRequest } from '../../../../hooks/useUnifiedRequests';
 import ConfirmationModal from '../../../../components/ConfirmationModal';
 
 interface RequestActionModalProps {
