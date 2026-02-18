@@ -20,7 +20,9 @@ import CreateCollaborator from './pages/Admin/Collaborators/CreateCollaborator';
 import ActiveCollaborators from './pages/Admin/Collaborators/ActiveCollaborators';
 import RequestsPage from './pages/Admin/Collaborators/Requests';
 import OrganizationPage from './pages/Admin/Organization';
-import AttendancePage from './pages/Admin/Attendance';
+// import AttendancePage from './pages/Admin/Attendance';
+import VacationsPage from './pages/Admin/Attendance/Vacations';
+import CalendarPage from './pages/Admin/Attendance/Calendar';
 
 // Protected Route Component
 const ProtectedRoute = () => {
@@ -74,7 +76,12 @@ function App() {
                 <Route path="admin/collaborators/requests" element={<RequestsPage />} />
 
                 <Route path="admin/organization" element={<OrganizationPage />} />
-                <Route path="admin/attendance" element={<AttendancePage />} />
+
+                <Route path="admin/attendance">
+                  <Route index element={<Navigate to="vacations" replace />} />
+                  <Route path="vacations" element={<VacationsPage />} />
+                  <Route path="calendar" element={<CalendarPage />} />
+                </Route>
 
                 {/* Other Module Placeholders */}
                 <Route path="org-dev/*" element={<PlaceholderPage title="Desarrollo Organizacional" />} />

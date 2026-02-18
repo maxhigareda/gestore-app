@@ -83,14 +83,12 @@ const EvaluationsPage: React.FC = () => {
 
                 <button
                     onClick={() => setIsModalOpen(true)}
+                    className="btn-primary"
                     style={{
                         display: 'flex',
                         alignItems: 'center',
                         gap: '8px',
                         padding: '8px 16px',
-                        backgroundColor: 'var(--color-primary)',
-                        color: 'white',
-                        border: 'none',
                         borderRadius: '6px',
                         fontSize: '0.9rem',
                         cursor: 'pointer'

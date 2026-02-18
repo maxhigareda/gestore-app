@@ -455,7 +455,13 @@ const Field: React.FC<FieldProps> = ({ label, value, onChange, type = 'text', di
             disabled={disabled}
             className="input-field"
             style={{
-                backgroundColor: disabled ? 'var(--color-background)' : undefined, // Keep specific overriding logic if needed, but class handles base
+                width: '100%',
+                padding: '12px',
+                borderRadius: '6px',
+                border: '1px solid var(--border-color)',
+                backgroundColor: disabled ? 'var(--color-background)' : 'var(--color-secondary-background)',
+                color: 'var(--color-text-primary)',
+                fontFamily: 'inherit',
                 opacity: disabled ? 0.6 : 1
             }}
         />

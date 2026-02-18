@@ -96,21 +96,18 @@ const PersonalInfoCard: React.FC<PersonalInfoCardProps> = ({ user, onEdit }) => 
                     {user.role}
                 </p>
 
-                <button style={{
+                <button className="btn-primary" style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
                     padding: '8px 16px',
                     borderRadius: '20px',
-                    border: '1px solid var(--border-color)',
-                    backgroundColor: 'transparent',
-                    color: 'var(--color-text-secondary)',
+                    border: '1px solid var(--border-color)', // Keeping border for shape, but class handles color
                     fontSize: '0.875rem',
                     cursor: 'pointer',
                     transition: 'all 0.2s',
+                    marginTop: '1rem', // Added margin
                 }}
-                    onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-primary)'; e.currentTarget.style.color = '#fff'; }}
-                    onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--color-text-secondary)'; }}
                     onClick={onEdit}
                 >
                     <Edit2 size={14} />
