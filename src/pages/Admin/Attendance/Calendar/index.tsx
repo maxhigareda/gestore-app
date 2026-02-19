@@ -11,9 +11,7 @@ const CalendarPage: React.FC = () => {
 
     // Filter Logic
     const filteredRequests = useMemo(() => {
-        let filtered = requests.filter(r => r.status === 'Aprobada' || r.status === 'Solicitada'); // Show pending too? Google Cal usually shows confirmed. User said "veremos las vacaciones...". Let's show approved primarily, maybe pending in lighter color?
-        // Logic: Show Approved Only for clean view, or both.
-        // Let's show "Aprobada" as solid, "Solicitada" as striped/lighter.
+        let filtered = requests.filter(r => r.status === 'Aprobada');
         return filtered;
     }, [requests]);
 
@@ -188,8 +186,7 @@ const EventBar = ({ event }: { event: UnifiedRequest }) => {
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
-            cursor: 'default',
-            opacity: event.status === 'Solicitada' ? 0.6 : 1 // Dim if pending
+            cursor: 'default'
         }} title={`${event.userName} - ${event.type}`}>
             {shortName}
         </div>
