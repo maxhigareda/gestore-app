@@ -94,10 +94,14 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
             const updates = {
                 first_name: formData.firstName,
                 last_name: formData.lastName,
+                gender: formData.gender || null,
                 job_title: formData.role,
                 rfc: formData.rfc,
                 birth_date: sanitizeDate(formData.birthDate),
                 address: formData.address,
+                address_state: formData.addressState || null,
+                address_municipality: formData.addressMunicipality || null,
+                address_zip_code: formData.addressZip || null,
                 phone: formData.phoneOffice || null, // Mapping to generic phone column if exists, or specific
                 phone_office: formData.phoneOffice || null,
                 phone_personal: formData.phonePersonal || null,
@@ -227,6 +231,19 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
                             <>
                                 <Field label="Nombre(s)" value={formData.firstName} onChange={v => handleChange('firstName', v)} />
                                 <Field label="Apellidos" value={formData.lastName} onChange={v => handleChange('lastName', v)} />
+                                <div style={{ gridColumn: 'auto' }}>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--color-text-secondary)', fontWeight: 500 }}>Género</label>
+                                    <select
+                                        value={formData.gender || ''}
+                                        onChange={e => handleChange('gender', e.target.value)}
+                                        className="input-field"
+                                    >
+                                        <option value="">Seleccione...</option>
+                                        <option value="Masculino">Masculino</option>
+                                        <option value="Femenino">Femenino</option>
+                                        <option value="No Binario">No Binario</option>
+                                    </select>
+                                </div>
                                 <Field label="Email Corporativo" value={formData.email} disabled />
                                 <Field label="Email Personal" value={formData.emailPersonal} onChange={v => handleChange('emailPersonal', v)} />
                                 <Field label="Teléfono Oficina" value={formData.phoneOffice} onChange={v => handleChange('phoneOffice', v)} />
@@ -281,7 +298,10 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
 
                                 <div style={{ gridColumn: '1 / -1' }}><hr style={{ border: 0, borderTop: '1px solid var(--border-color)' }} /></div>
 
-                                <Field label="Dirección Completa" value={formData.address} fullWidth onChange={v => handleChange('address', v)} />
+                                <Field label="Dirección (Calle y Número)" value={formData.address} fullWidth onChange={v => handleChange('address', v)} />
+                                <Field label="Estado" value={formData.addressState} onChange={v => handleChange('addressState', v)} />
+                                <Field label="Municipio" value={formData.addressMunicipality} onChange={v => handleChange('addressMunicipality', v)} />
+                                <Field label="Código Postal" value={formData.addressZip} onChange={v => handleChange('addressZip', v)} />
                                 <Field label="Contacto Emergencia" value={formData.emergencyName} onChange={v => handleChange('emergencyName', v)} />
                                 <Field label="Tel. Emergencia" value={formData.emergencyPhone} onChange={v => handleChange('emergencyPhone', v)} />
                             </>
@@ -359,6 +379,16 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
                                 <Field label="Ubicación de Trabajo" value={formData.workLocation} onChange={v => handleChange('workLocation', v)} />
                                 <Field label="Registro Patronal" value={formData.patronalRegistration} onChange={v => handleChange('patronalRegistration', v)} />
                                 <Field label="Tipo de Contrato" value={formData.contractType} onChange={v => handleChange('contractType', v)} />
+
+                                <div style={{ gridColumn: 'auto' }}>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--color-text-secondary)', fontWeight: 500 }}>Forma de Pago</label>
+                                    <select value={formData.paymentMethod || ''} onChange={e => handleChange('paymentMethod', e.target.value)} className="input-field">
+                                        <option value="">Seleccione...</option>
+                                        <option value="Transferencia">Transferencia Bancaria</option>
+                                        <option value="Cheque">Cheque</option>
+                                        <option value="Efectivo">Efectivo</option>
+                                    </select>
+                                </div>
 
                                 <div style={{ gridColumn: '1 / -1' }}><hr style={{ border: 0, borderTop: '1px solid var(--border-color)' }} /></div>
 

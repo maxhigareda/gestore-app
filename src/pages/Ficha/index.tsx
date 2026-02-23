@@ -75,11 +75,15 @@ const FichaPage: React.FC = () => {
                     photoUrl: data.photo_url || user.photoUrl || '',
                     firstName: data.first_name || '',
                     lastName: data.last_name || '',
+                    gender: data.gender || '',
                     role: data.job_title || '',
                     rfc: data.rfc || '',
                     email: data.email || user.email || '',
                     birthDate: data.birth_date || '',
                     address: data.address || '',
+                    addressState: data.address_state || '',
+                    addressMunicipality: data.address_municipality || '',
+                    addressZip: data.address_zip_code || '',
 
                     // Contact & Personal
                     phoneOffice: data.phone || data.phone_office || '',

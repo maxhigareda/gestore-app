@@ -3,11 +3,16 @@ export interface UserProfile {
     photoUrl?: string; // Empty for now
     firstName: string;
     lastName: string;
+    lastNameMother?: string;
+    gender?: string;
     role: string;
     rfc: string;
     email: string;
     birthDate: string; // YYYY-MM-DD
     address: string;
+    addressState?: string;
+    addressMunicipality?: string;
+    addressZip?: string;
     dateOfEntry: string; // YYYY-MM-DD
 
     // Resumen Fields
