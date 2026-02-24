@@ -15,6 +15,7 @@ const UserStatusPage: React.FC = () => {
     const [users, setUsers] = useState<UserStatus[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState<'all' | 'confirmed' | 'pending'>('all');
 
     useEffect(() => {
         fetchUsersStatus();
@@ -36,10 +37,18 @@ const UserStatusPage: React.FC = () => {
         }
     };
 
-    const filteredUsers = users.filter(user =>
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (user.full_name && user.full_name.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    const filteredUsers = users.filter(user => {
+        const matchesSearch = user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (user.full_name && user.full_name.toLowerCase().includes(searchTerm.toLowerCase()));
+
+        if (!matchesSearch) return false;
+
+        // Filter by Status
+        if (statusFilter === 'confirmed') return !!user.email_confirmed_at;
+        if (statusFilter === 'pending') return !user.email_confirmed_at;
+
+        return true;
+    });
 
     const confirmedCount = users.filter(u => u.email_confirmed_at).length;
     const pendingCount = users.length - confirmedCount;
@@ -63,14 +72,14 @@ const UserStatusPage: React.FC = () => {
                 </div>
             </div>
 
-            <div style={{ marginBottom: '1.5rem' }}>
+            <div style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem' }}>
                 <input
                     type="text"
                     placeholder="Buscar por nombre o correo..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     style={{
-                        width: '100%',
+                        flex: 1,
                         maxWidth: '400px',
                         padding: '10px 15px',
                         borderRadius: '8px',
@@ -79,6 +88,22 @@ const UserStatusPage: React.FC = () => {
                         color: 'var(--color-text-primary)'
                     }}
                 />
+                <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value as 'all' | 'confirmed' | 'pending')}
+                    style={{
+                        padding: '10px 15px',
+                        borderRadius: '8px',
+                        border: '1px solid var(--border-color)',
+                        backgroundColor: 'var(--color-surface)',
+                        color: 'var(--color-text-primary)',
+                        cursor: 'pointer'
+                    }}
+                >
+                    <option value="all">Todos los estatus</option>
+                    <option value="confirmed">Solo Confirmados</option>
+                    <option value="pending">Solo Pendientes</option>
+                </select>
             </div>
 
             {loading ? (
