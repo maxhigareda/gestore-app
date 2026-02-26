@@ -120,10 +120,10 @@ const CreateCollaborator: React.FC = () => {
     const downloadTemplate = () => {
         const headers = [
             "Nombre", "Apellido Paterno", "Apellido Materno", "Genero", "Pais Nacimiento",
-            "Tipo Documento", "RFC", "CURP", "NSS", "Estado Civil", "Fecha Nacimiento",
-            "Telefono Oficina", "Telefono Personal", "Email Corporativo", "Email Personal",
+            "RFC", "CURP", "NSS", "Estado Civil", "Fecha Nacimiento",
+            "Telefono Personal", "Email Corporativo",
             "Calle y Numero", "Estado", "Municipio", "Codigo Postal",
-            "Metodo Pago", "Fecha Ingreso", "Nombre Emergencia", "Telefono Emergencia"
+            "Fecha Ingreso", "Nombre Emergencia", "Telefono Emergencia"
         ];
         const csvContent = "data:text/csv;charset=utf-8," + headers.join(",");
         const encodedUri = encodeURI(csvContent);
@@ -545,6 +545,7 @@ const CreateCollaborator: React.FC = () => {
                             <h3 style={{ marginBottom: '1rem', color: 'var(--color-primary)' }}>Documentos</h3>
                         </div>
 
+                        {/* Ocultado por solicitud
                         <div className="form-group">
                             <label>Tipo de Documento</label>
                             <select name="documentType" value={isMexico ? 'RFC' : formData.documentType} disabled={isMexico} onChange={handleChange} className="input-field">
@@ -552,6 +553,7 @@ const CreateCollaborator: React.FC = () => {
                                 <option value="Otro">Otro</option>
                             </select>
                         </div>
+                        */}
 
                         <div className="form-group">
                             <label>{isMexico ? 'RFC (México)*' : 'Identificación / RFC*'}</label>
@@ -577,15 +579,20 @@ const CreateCollaborator: React.FC = () => {
                             <label>Email Corporativo*</label>
                             <input type="email" name="emailCorporate" value={formData.emailCorporate} onChange={handleChange} required className="input-field" />
                         </div>
+
+                        {/* Ocultado por solicitud
                         <div className="form-group">
                             <label>Email Personal</label>
                             <input type="email" name="emailPersonal" value={formData.emailPersonal} onChange={handleChange} className="input-field" />
                         </div>
+                        */}
 
+                        {/* Ocultado por solicitud
                         <div className="form-group">
                             <label>Teléfono Oficina</label>
                             <input type="tel" name="phoneOffice" value={formData.phoneOffice} onChange={handleChange} className="input-field" />
                         </div>
+                        */}
                         <div className="form-group">
                             <label>Teléfono Particular</label>
                             <input type="tel" name="phonePersonal" value={formData.phonePersonal} onChange={handleChange} className="input-field" />
@@ -648,10 +655,12 @@ const CreateCollaborator: React.FC = () => {
                             <input type="text" name="division" value={formData.division} onChange={handleChange} className="input-field" placeholder="Ej. Comercial, Operaciones" />
                         </div>
 
+                        {/* Ocultado por solicitud
                         <div className="form-group">
                             <label>Centro de Costo</label>
                             <input type="text" name="costCenter" value={formData.costCenter} onChange={handleChange} className="input-field" />
                         </div>
+                        */}
 
                         <div className="form-group">
                             <label>Registro Patronal</label>
@@ -692,11 +701,14 @@ const CreateCollaborator: React.FC = () => {
                             </select>
                         </div>
 
+                        {/* Ocultado por solicitud
                         <div className="form-group">
                             <label>Equipo (Team)</label>
                             <input type="text" name="team" value={formData.team} onChange={handleChange} className="input-field" />
                         </div>
+                        */}
 
+                        {/* Ocultado por solicitud
                         <div className="form-group">
                             <label>Tipo de Régimen</label>
                             <select name="regimeType" value={formData.regimeType} onChange={handleChange} className="input-field">
@@ -706,6 +718,7 @@ const CreateCollaborator: React.FC = () => {
                                 <option value="Honorarios">Honorarios</option>
                             </select>
                         </div>
+                        */}
 
                         <div className="form-group">
                             <label>Tipo de Contrato</label>
@@ -717,6 +730,7 @@ const CreateCollaborator: React.FC = () => {
                             </select>
                         </div>
 
+                        {/* Ocultado por solicitud
                         <div className="form-group">
                             <label>Forma de Pago*</label>
                             <select name="paymentMethod" value={formData.paymentMethod} onChange={handleChange} required className="input-field">
@@ -726,11 +740,14 @@ const CreateCollaborator: React.FC = () => {
                                 <option value="Efectivo">Efectivo</option>
                             </select>
                         </div>
+                        */}
 
+                        {/* COMENTADO POR SOLICITUD DEL USUARIO
                         <div className="form-group">
                             <label>Sueldo Base (Mensual)</label>
                             <input type="number" name="salary" value={formData.salary} onChange={handleChange} className="input-field" placeholder="0.00" />
                         </div>
+                        */}
 
                         <div className="form-group">
                             <label>Tipo de Compensación</label>

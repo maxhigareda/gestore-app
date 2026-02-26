@@ -341,7 +341,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
                                 </div>
 
                                 <Field label="División" value={formData.division} onChange={v => handleChange('division', v)} />
+                                {/* Ocultado por solicitud
                                 <Field label="Centro de Costos" value={formData.costCenter} onChange={v => handleChange('costCenter', v)} />
+                                */}
 
                                 <div style={{ gridColumn: '1 / -1' }}>
                                     <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--color-text-secondary)', fontWeight: 500 }}>Supervisor</label>
@@ -359,7 +361,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
                                     </select>
                                 </div>
 
+                                {/* Ocultado por solicitud
                                 <Field label="Equipo" value={formData.team} onChange={v => handleChange('team', v)} />
+                                */}
                                 <div style={{ gridColumn: 'auto' }}>
                                     <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--color-text-secondary)', fontWeight: 500 }}>Suplente</label>
                                     <select
@@ -375,7 +379,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
                                         ))}
                                     </select>
                                 </div>
+                                {/* Ocultado por solicitud
                                 <Field label="Tipo de Régimen" value={formData.regimeType} onChange={v => handleChange('regimeType', v)} />
+                                */}
                                 <Field label="Ubicación de Trabajo" value={formData.workLocation} onChange={v => handleChange('workLocation', v)} />
                                 <Field label="Registro Patronal" value={formData.patronalRegistration} onChange={v => handleChange('patronalRegistration', v)} />
                                 <Field label="Tipo de Contrato" value={formData.contractType} onChange={v => handleChange('contractType', v)} />
@@ -392,7 +398,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, userId, onClo
 
                                 <div style={{ gridColumn: '1 / -1' }}><hr style={{ border: 0, borderTop: '1px solid var(--border-color)' }} /></div>
 
+                                {/* Ocultado por solicitud
                                 <Field label="Sueldo Base" value={String(formData.salary || '')} type="number" onChange={v => handleChange('salary', v ? parseFloat(v) : 0)} />
+                                */}
                                 <div style={{ gridColumn: 'auto' }}>
                                     <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--color-text-secondary)', fontWeight: 500 }}>Tipo de Compensación</label>
                                     <select value={formData.compensationType || ''} onChange={e => handleChange('compensationType', e.target.value)} className="input-field">

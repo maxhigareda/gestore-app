@@ -23,6 +23,7 @@ import UserStatusPage from './pages/Admin/Collaborators/UserStatus';
 import OrganizationPage from './pages/Admin/Organization';
 // import AttendancePage from './pages/Admin/Attendance';
 import VacationsPage from './pages/Admin/Attendance/Vacations';
+import PermissionsPage from './pages/Admin/Attendance/Permissions';
 import CalendarPage from './pages/Admin/Attendance/Calendar';
 
 // Protected Route Component
@@ -82,6 +83,7 @@ function App() {
                 <Route path="admin/attendance">
                   <Route index element={<Navigate to="vacations" replace />} />
                   <Route path="vacations" element={<VacationsPage />} />
+                  <Route path="permissions" element={<PermissionsPage />} />
                   <Route path="calendar" element={<CalendarPage />} />
                 </Route>
 

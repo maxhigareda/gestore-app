@@ -187,6 +187,7 @@ const SecondarySidebar: React.FC = () => {
                 {openMenus['attendance'] && (
                     <div style={{ paddingLeft: '1rem', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                         <SubMenuLink label="Vacaciones" onClick={() => navigate('/admin/attendance/vacations')} />
+                        <SubMenuLink label="Permisos" onClick={() => navigate('/admin/attendance/permissions')} />
                         <SubMenuLink label="Calendario" onClick={() => navigate('/admin/attendance/calendar')} />
                     </div>
                 )}

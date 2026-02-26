@@ -20,7 +20,8 @@ const PERMISSION_TYPES = [
     'Permiso para el área de operaciones',
     'Trabajo fin de semana',
     'Trabajo día festivo',
-    'Permiso sin goce de sueldo'
+    'Permiso sin goce de sueldo',
+    'Horas extra'
 ];
 
 const PermissionRequestModal: React.FC<PermissionRequestModalProps> = ({
