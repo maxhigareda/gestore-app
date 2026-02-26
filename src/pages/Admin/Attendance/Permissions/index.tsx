@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../../../../lib/supabaseClient';
 import { useAuth } from '../../../../context/AuthContext';
-import { Trash2, Eye } from 'lucide-react';
+import { Trash2, Eye, Link } from 'lucide-react';
 import RequestActionModal from '../../Collaborators/Requests/RequestActionModal';
 import { useUnifiedRequests, type UnifiedRequest } from '../../../../hooks/useUnifiedRequests';
 
@@ -85,7 +85,7 @@ const PermissionsPage: React.FC = () => {
                     {activeTab === 'approved' && (
                         <RequestsTable
                             data={approvedRequests}
-                            columns={['Nombre', 'Fecha Inicio', 'Días', 'Solicitado el', 'Estado']}
+                            columns={['Nombre', 'Fecha Inicio', 'Días', 'Solicitado el', 'Evidencia', 'Estado']}
                             onAction={(r) => handleActionClick(r, 'viewer')}
                             onDelete={(id) => handleDelete(id, 'permission_requests')}
                             mode="approved"
@@ -95,7 +95,7 @@ const PermissionsPage: React.FC = () => {
                     {activeTab === 'pending' && (
                         <RequestsTable
                             data={myPendingRequests}
-                            columns={['Nombre', 'Fecha Inicio', 'Días', 'Solicitado el', 'Estado']}
+                            columns={['Nombre', 'Fecha Inicio', 'Días', 'Solicitado el', 'Evidencia', 'Estado']}
                             onAction={(r) => handleActionClick(r, 'supervisor')}
                             mode="pending"
                         />
@@ -104,7 +104,7 @@ const PermissionsPage: React.FC = () => {
                     {activeTab === 'rejected' && (
                         <RequestsTable
                             data={rejectedRequests}
-                            columns={['Nombre', 'Fecha Inicio', 'Días', 'Solicitado el', 'Comentario']}
+                            columns={['Nombre', 'Fecha Inicio', 'Días', 'Solicitado el', 'Evidencia', 'Comentario']}
                             onAction={(r) => handleActionClick(r, 'viewer')}
                             onDelete={(id) => handleDelete(id, 'permission_requests')}
                             mode="rejected"
@@ -185,6 +185,15 @@ const RequestsTable: React.FC<RequestsTableProps> = ({ data, columns, onAction, 
                         <td style={{ padding: '1rem' }}>{new Date(r.startDate).toLocaleDateString()}</td>
                         <td style={{ padding: '1rem' }}>{r.days} días</td>
                         <td style={{ padding: '1rem' }}>{new Date(r.created_at).toLocaleDateString()}</td>
+                        <td style={{ padding: '1rem' }}>
+                            {r.evidenceUrl ? (
+                                <a href={r.evidenceUrl} target="_blank" rel="noopener noreferrer" title="Ver Evidencia" style={{ color: 'var(--color-primary)' }}>
+                                    <Link size={18} />
+                                </a>
+                            ) : (
+                                <span style={{ color: 'var(--color-text-muted)' }}>-</span>
+                            )}
+                        </td>
                         <td style={{ padding: '1rem' }}>
                             {mode === 'rejected' ? (
                                 <span style={{ color: 'var(--color-text-muted)', fontStyle: 'italic' }}>{r.reason || '-'}</span>

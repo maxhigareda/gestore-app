@@ -11,6 +11,7 @@ interface PermissionRequestModalProps {
         endDate: string;
         type?: string;
         comment?: string;
+        evidenceUrl?: string;
     };
 }
 
@@ -34,6 +35,7 @@ const PermissionRequestModal: React.FC<PermissionRequestModalProps> = ({
     const [startDate, setStartDate] = useState(initialData?.startDate || '');
     const [endDate, setEndDate] = useState(initialData?.endDate || '');
     const [comment, setComment] = useState(initialData?.comment || '');
+    const [evidenceUrl, setEvidenceUrl] = useState(initialData?.evidenceUrl || '');
     const [daysRequested, setDaysRequested] = useState(0);
 
     // Calculate days difference
@@ -67,7 +69,8 @@ const PermissionRequestModal: React.FC<PermissionRequestModalProps> = ({
                     days_requested: daysRequested,
                     reason: comment,
                     status: 'Solicitada',
-                    type: type
+                    type: type,
+                    evidence_url: evidenceUrl
                 });
                 if (error) throw error;
             } else if (mode === 'edit' && initialData?.id) {
@@ -76,7 +79,8 @@ const PermissionRequestModal: React.FC<PermissionRequestModalProps> = ({
                     end_date: endDate,
                     days_requested: daysRequested,
                     reason: comment,
-                    type: type
+                    type: type,
+                    evidence_url: evidenceUrl
                 }).eq('id', initialData.id);
                 if (error) throw error;
             }
@@ -159,6 +163,24 @@ const PermissionRequestModal: React.FC<PermissionRequestModalProps> = ({
                     style={{ ...inputStyle, resize: 'none', opacity: mode === 'view' ? 0.7 : 1 }}
                     placeholder={mode === 'view' ? "Sin comentarios" : "Motivo del permiso..."}
                 />
+            </div>
+
+            {/* Evidence URL */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={labelStyle}>URL de Evidencia</label>
+                <input
+                    type="url"
+                    disabled={mode === 'view'}
+                    value={evidenceUrl}
+                    onChange={(e) => setEvidenceUrl(e.target.value)}
+                    style={{ ...inputStyle, opacity: mode === 'view' ? 0.7 : 1 }}
+                    placeholder={mode === 'view' ? "Sin evidencia" : "Enlace opcional (ej. Google Drive)"}
+                />
+                {mode === 'view' && evidenceUrl && (
+                    <a href={evidenceUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85rem', color: 'var(--color-primary)' }}>
+                        Abrir enlace de evidencia
+                    </a>
+                )}
             </div>
 
             {/* Actions */}

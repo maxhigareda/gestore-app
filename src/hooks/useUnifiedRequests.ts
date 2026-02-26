@@ -14,6 +14,7 @@ export interface UnifiedRequest {
     status: 'Solicitada' | 'Aprobada' | 'Rechazada';
     days: number;
     reason?: string;
+    evidenceUrl?: string;
     created_at: string;
 }
 
@@ -76,6 +77,7 @@ export const useUnifiedRequests = (userId?: string) => {
                     status: r.status,
                     days: r.days_taken,
                     reason: r.comments,
+                    evidenceUrl: undefined,
                     created_at: r.created_at
                 });
             });
@@ -95,6 +97,7 @@ export const useUnifiedRequests = (userId?: string) => {
                     status: r.status,
                     days: r.days_requested,
                     reason: r.reason,
+                    evidenceUrl: r.evidence_url,
                     created_at: r.created_at
                 });
             });
